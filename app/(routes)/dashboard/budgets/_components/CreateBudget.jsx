@@ -47,7 +47,7 @@ function CreateBudget() {
     <div>
       <Dialog>
         <DialogTrigger asChild>
-          <div className="bg-slate-100 p-10 rounded-md items-center flex flex-col border-2 border-dashed cursor-pointer hover:shadow-md hover:bg-slate-200 transition-all duration-400">
+          <div className="bg-slate-100 p-10 rounded-md items-center flex flex-col border-2 border-dashed cursor-pointer hover:shadow-md hover:shadow-indigo-300 hover:bg-slate-200 transition-all duration-400">
             <h2 className="text-3xl">+</h2>
             <h2>Create New Budget</h2>
           </div>

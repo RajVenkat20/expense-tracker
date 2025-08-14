@@ -9,7 +9,7 @@
     "lint": "next lint",
     "db:gen": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:push": "npx drizzle-kit push:pg",
+    "db:push": "npx drizzle-kit push",
     "db:pull": "drizzle-kit pull",
     "db:check": "drizzle-kit check",
     "db:studio": "drizzle-kit studio",
