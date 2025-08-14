@@ -8,14 +8,40 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
+  DialogClose
 } from "@/components/ui/dialog";
 import EmojiPicker from "emoji-picker-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { db } from "@/utils/dbConfig";
+import { Budgets } from "@/utils/schema";
+import { useUser } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 function CreateBudget() {
   const [emojiIcon, setEmojiIcon] = useState("😀");
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
+  const [name, setName] = useState();
+  const [amount, setAmount] = useState();
+  const { user } = useUser();
+
+  // Function to create a new budget
+  const onCreateBudget = async () => {
+    const result = await db
+      .insert(Budgets)
+      .values({
+        name: name,
+        amount: amount,
+        createdBy: user.primaryEmailAddress.emailAddress,
+        icon: emojiIcon,
+      })
+      .returning({ insertedId: Budgets.id });
+
+    if (result) {
+      toast("New Budget Created!");
+    }
+  };
 
   return (
     <div>
@@ -49,18 +75,36 @@ function CreateBudget() {
                   />
                 </div>
                 <div className="mt-4">
-                    <h2 className="text-black font-md my-1">Budget Name</h2>
-                    <Input placeholder="e.g. Home Decor"/>
+                  <h2 className="text-black font-md my-1">Budget Name</h2>
+                  <Input
+                    placeholder="e.g. Home Decor"
+                    onChange={(e) => setName(e.target.value)}
+                  />
                 </div>
                 <div className="mt-4">
-                    <h2 className="text-black font-md my-1">Budget Amount</h2>
-                    <Input placeholder="e.g. $5000"/>
+                  <h2 className="text-black font-md my-1">Budget Amount</h2>
+                  <Input
+                    type="number"
+                    placeholder="e.g. $5000"
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
                 </div>
 
-                <Button className="mt-10 w-full bg-indigo-600 hover:bg-indigo-700 hover:shadow-md hover:h-15 transition-all duration-400">Create Budget</Button>
+                
               </div>
             </DialogDescription>
           </DialogHeader>
+          <DialogFooter className="sm:justify-start">
+            <DialogClose asChild>
+              <Button
+                  disabled={!(name && amount)}
+                  onClick={() => onCreateBudget()}
+                  className="mt-10 w-full bg-indigo-600 hover:bg-indigo-700 hover:shadow-md hover:h-15 transition-all duration-400"
+                >
+                  Create Budget
+                </Button>
+            </DialogClose>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
