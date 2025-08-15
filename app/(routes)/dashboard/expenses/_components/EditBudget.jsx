@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { PenBox } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,53 +11,59 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-  DialogClose
+  DialogClose,
 } from "@/components/ui/dialog";
 import EmojiPicker from "emoji-picker-react";
-import { Button } from "@/components/ui/button";
+import { useUser } from "@clerk/nextjs";
 import { Input } from "@/components/ui/input";
 import { db } from "@/utils/dbConfig";
 import { Budgets } from "@/utils/schema";
-import { useUser } from "@clerk/nextjs";
+import { eq } from "drizzle-orm";
 import { toast } from "sonner";
 
-function CreateBudget({refreshData}) {
-  const [emojiIcon, setEmojiIcon] = useState("😀");
+function EditBudget({budgetInfo, refreshData}) {
+  const [emojiIcon, setEmojiIcon] = useState();
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
   const [name, setName] = useState();
   const [amount, setAmount] = useState();
   const { user } = useUser();
 
-  // Function to create a new budget
-  const onCreateBudget = async () => {
-    const result = await db
-      .insert(Budgets)
-      .values({
-        name: name,
-        amount: amount,
-        createdBy: user.primaryEmailAddress.emailAddress,
-        icon: emojiIcon,
-      })
-      .returning({ insertedId: Budgets.id });
+  useEffect(() => {
+    if (budgetInfo) {
+      setEmojiIcon(budgetInfo.icon ?? "");
+      setName(budgetInfo.name ?? "");
+      setAmount(budgetInfo.amount ?? "");
+    }
+  }, [budgetInfo]);
 
-    if (result) {
-      refreshData()
-      toast("New Budget Created!");
+  const onUpdateBudget = async () => {
+    const result = await db.update(Budgets).set({
+        name : name,
+        amount : amount,
+        icon : emojiIcon,
+    }).where(eq(Budgets.id, budgetInfo.id)).returning();
+
+    if(result)
+    {
+        refreshData()
+        toast('Budget Type edited successfully!')
     }
   };
+
+  if (!budgetInfo) return null;
 
   return (
     <div>
       <Dialog>
         <DialogTrigger asChild>
-          <div className="transform ease-out shadow-md hover:scale-102 bg-slate-100 p-10 rounded-md items-center flex flex-col border-2 border-dashed cursor-pointer hover:shadow-md hover:shadow-indigo-300 hover:bg-slate-200 transition-all duration-400">
-            <h2 className="text-3xl">+</h2>
-            <h2>New Budget Type</h2>
-          </div>
+          <Button className="flex gap-2 bg-indigo-600 hover:bg-indigo-700 transform transition-all ease-out duration-400 hover:scale-103 hover:shadow-lg">
+            <PenBox />
+            Edit Budget Type
+          </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create New Budget Type</DialogTitle>
+            <DialogTitle>Edit Budget Type</DialogTitle>
             <DialogDescription>
               <div className="mt-5 transition-all duration-400">
                 <h2 className="text-black font-md my-1">Select An Icon</h2>
@@ -78,7 +86,7 @@ function CreateBudget({refreshData}) {
                 <div className="mt-4">
                   <h2 className="text-black font-md my-1">Budget Type Name</h2>
                   <Input
-                    placeholder="e.g. Home Decor"
+                    defaultValue={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
@@ -86,24 +94,22 @@ function CreateBudget({refreshData}) {
                   <h2 className="text-black font-md my-1">Amount Limit</h2>
                   <Input
                     type="number"
-                    placeholder="e.g. $5000"
+                    defaultValue={amount}
                     onChange={(e) => setAmount(e.target.value)}
                   />
                 </div>
-
-                
               </div>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-start">
             <DialogClose asChild>
               <Button
-                  disabled={!(name && amount)}
-                  onClick={() => onCreateBudget()}
-                  className="mt-10 w-full bg-indigo-600 hover:bg-indigo-700 hover:shadow-md hover:h-15 transition-all duration-400"
-                >
-                  Create Budget Type
-                </Button>
+                disabled={!(name && amount)}
+                onClick={() => onUpdateBudget()}
+                className="mt-10 w-full bg-indigo-600 hover:bg-indigo-700 hover:shadow-md hover:h-15 transition-all duration-400"
+              >
+                Edit
+              </Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
@@ -112,4 +118,4 @@ function CreateBudget({refreshData}) {
   );
 }
 
-export default CreateBudget;
+export default EditBudget;
