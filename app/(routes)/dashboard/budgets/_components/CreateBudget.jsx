@@ -48,14 +48,14 @@ function CreateBudget({refreshData}) {
     <div>
       <Dialog>
         <DialogTrigger asChild>
-          <div className="bg-slate-100 p-10 rounded-md items-center flex flex-col border-2 border-dashed cursor-pointer hover:shadow-md hover:shadow-indigo-300 hover:bg-slate-200 transition-all duration-400">
+          <div className="transform ease-out hover:scale-102 bg-slate-100 p-10 rounded-md items-center flex flex-col border-2 border-dashed cursor-pointer hover:shadow-md hover:shadow-indigo-300 hover:bg-slate-200 transition-all duration-400">
             <h2 className="text-3xl">+</h2>
-            <h2>Create New Budget</h2>
+            <h2>New Budget Type</h2>
           </div>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create New Budget</DialogTitle>
+            <DialogTitle>Create New Budget Type</DialogTitle>
             <DialogDescription>
               <div className="mt-5 transition-all duration-400">
                 <h2 className="text-black font-md my-1">Select An Icon</h2>
@@ -76,14 +76,14 @@ function CreateBudget({refreshData}) {
                   />
                 </div>
                 <div className="mt-4">
-                  <h2 className="text-black font-md my-1">Budget Name</h2>
+                  <h2 className="text-black font-md my-1">Budget Type Name</h2>
                   <Input
                     placeholder="e.g. Home Decor"
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
                 <div className="mt-4">
-                  <h2 className="text-black font-md my-1">Budget Amount</h2>
+                  <h2 className="text-black font-md my-1">Amount Limit</h2>
                   <Input
                     type="number"
                     placeholder="e.g. $5000"
@@ -102,7 +102,7 @@ function CreateBudget({refreshData}) {
                   onClick={() => onCreateBudget()}
                   className="mt-10 w-full bg-indigo-600 hover:bg-indigo-700 hover:shadow-md hover:h-15 transition-all duration-400"
                 >
-                  Create Budget
+                  Create Budget Type
                 </Button>
             </DialogClose>
           </DialogFooter>
