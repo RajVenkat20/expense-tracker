@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React from "react";
 import SideNav from "./_components/SideNav";
@@ -11,30 +11,31 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 function DashboardLayout({ children }) {
-
-  const {user} = useUser();
+  const { user } = useUser();
   const router = useRouter();
 
   useEffect(() => {
     user && checkUserBudgets();
-  }, [user])
+  }, [user]);
 
-  const checkUserBudgets = async() => {
-    const result = await db.select().from(Budgets).where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress))
+  const checkUserBudgets = async () => {
+    const result = await db
+      .select()
+      .from(Budgets)
+      .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress));
 
-    if(result.length == 0)
-    {
-      router.replace('/dashboard/budgets')
+    if (result.length == 0) {
+      router.replace("/dashboard/budgets");
     }
-  }
+  };
 
   return (
     <div>
-      <div className='fixed md:w-64 hidden md:block'>
+      <div className="fixed md:w-64 hidden md:block">
         <SideNav />
       </div>
-      <div className='md:ml-64'>
-        <DashboardHeader/>
+      <div className="md:ml-64">
+        <DashboardHeader />
         {children}
       </div>
     </div>

@@ -30,6 +30,7 @@ function ExpenseScreen({ params }) {
   const [budgetInfo, setBudgetInfo] = useState();
   const [expensesList, setExpensesList] = useState([]);
   const route = useRouter();
+  const { id } = React.use(params);
 
   useEffect(() => {
     user && getBudgetInfo();
@@ -46,7 +47,7 @@ function ExpenseScreen({ params }) {
       .from(Budgets)
       .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
       .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress))
-      .where(eq(Budgets.id, params.id))
+      .where(eq(Budgets.id, id))
       .groupBy(Budgets.id);
 
     // Indexing with 0 since the value fetched is always an array with a single object that matches the id
@@ -59,7 +60,7 @@ function ExpenseScreen({ params }) {
     const result = await db
       .select()
       .from(Expenses)
-      .where(eq(Expenses.budgetId, params.id))
+      .where(eq(Expenses.budgetId, id))
       .orderBy(desc(Expenses.id));
 
     setExpensesList(result);
@@ -69,13 +70,13 @@ function ExpenseScreen({ params }) {
   const deleteBudgetType = async () => {
     const deleteExpenseResult = await db
       .delete(Expenses)
-      .where(eq(Expenses.budgetId, params.id))
+      .where(eq(Expenses.budgetId, id))
       .returning();
 
     if (deleteExpenseResult) {
       const result = await db
         .delete(Budgets)
-        .where(eq(Budgets.id, params.id))
+        .where(eq(Budgets.id, id))
         .returning();
     }
 
@@ -128,7 +129,7 @@ function ExpenseScreen({ params }) {
           <div className="h-[150px] w-full bg-slate-200 rounded-lg animate-pulse"></div>
         )}
         <AddExpense
-          budgetId={params.id}
+          budgetId={id}
           user={user}
           refreshData={() => getBudgetInfo()}
         />
@@ -137,7 +138,7 @@ function ExpenseScreen({ params }) {
         <h2 className="font-bold text-lg">Latest Expenses</h2>
         <ExpenseListTable
           expensesList={expensesList}
-          refreshData={getBudgetInfo()}
+          refreshData={getBudgetInfo}
         />
       </div>
     </div>
