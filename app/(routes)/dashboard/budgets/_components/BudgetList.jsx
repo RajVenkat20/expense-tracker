@@ -38,7 +38,7 @@ function BudgetList() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <CreateBudget refreshData={() => getBudgetList()} />
         {budgetList.length > 0
-          ? budgetList.map((budget, idx) => <BudgetItem budget={budget} />)
+          ? budgetList.map((budget, idx) => <BudgetItem key={idx} budget={budget} />)
           : [1, 2, 3, 4, 5].map((item, idx) => (
               <div
                 key={idx}

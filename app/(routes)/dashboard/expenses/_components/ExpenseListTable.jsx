@@ -28,7 +28,7 @@ function ExpenseListTable({ expensesList, refreshData }) {
         <h2>Action</h2>
       </div>
       {expensesList.map((expenses, idx) => (
-        <div className="mt-4 grid grid-cols-4 bg-slate-50 p-4 rounded-lg hover:bg-slate-100 transform transition-all duration-400 hover:scale-102 ease-out hover:shadow-md">
+        <div key={idx} className="mt-4 grid grid-cols-4 bg-slate-50 p-4 rounded-lg hover:bg-slate-100 transform transition-all duration-400 hover:scale-102 ease-out hover:shadow-md">
           <h2>{expenses.name}</h2>
           <h2 className="text-indigo-600 font-bold">
             ${expenses.amount}

@@ -19,7 +19,6 @@ function AddExpense({budgetId, user, refreshData}) {
         createdAt : moment().format('MM/DD/YYYY')
       }).returning({insertedId : Budgets.id})
 
-      console.log(result)
       if(result)
       {
         refreshData()

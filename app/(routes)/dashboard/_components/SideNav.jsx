@@ -37,16 +37,12 @@ function SideNav() {
 
   const path = usePathname();
 
-  useEffect(() => {
-    console.log(path);
-  }, []);
-
   return (
     <div className="h-screen p-5 border shadow-md">
       <Image src={"/logo.svg"} alt="PennyPilot Logo" width={50} height={50} />
       <div className="mt-5">
         {menuList.map((menu, idx) => (
-          <Link href={menu.path}>
+          <Link href={menu.path} key={idx}>
             <h2
               className={`flex gap-2 items-center text-gray-700 font-medium mb-3 p-5 cursor-pointer rounded-md hover:text-indigo-700 hover:bg-blue-100 hover:shadow-md transition-all duration-400 ${
                 path == menu.path && "text-indigo-700 bg-blue-100"
