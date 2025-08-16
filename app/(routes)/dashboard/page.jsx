@@ -6,6 +6,8 @@ import CardInfo from "./_components/CardInfo";
 import { db } from "@/utils/dbConfig";
 import { desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { Budgets, Expenses } from "@/utils/schema";
+import BarChartDashboard from "./_components/BarChartDashboard";
+import BudgetItem from "./budgets/_components/BudgetItem";
 
 function Dashboard() {
   const { user } = useUser();
@@ -37,8 +39,19 @@ function Dashboard() {
       <h2 className="font-bold text-3xl">
         Hi, <strong className="text-indigo-600">{user?.fullName}</strong> ✌️
       </h2>
-      <p className="text-gray-500">Here's what's happening with your money!</p>
+      <p className="text-gray-500 mt-2">Here's what's happening with your money!</p>
       <CardInfo budgetList={budgetList}/>
+      <div className="grid grid-cols-1 md:grid-cols-3 mt-6 gap-5">
+        <div className="md:col-span-2">
+          <BarChartDashboard budgetList={budgetList}/>
+        </div>
+        <div className="grid gap-5">
+          {/* <h2 className="font-bold text-lg">Budget Types</h2> */}
+          {budgetList.map((budget, idx) => (
+            <BudgetItem budget={budget} key={idx}/>
+          ))}
+        </div> 
+      </div>
     </div>
   );
 }

@@ -10,7 +10,6 @@ function CardInfo({ budgetList }) {
   }, [budgetList]);
 
   const calculateCardsInfo = () => {
-    console.log(budgetList);
     let totalBudget_ = 0;
     let totalSpent_ = 0;
 
