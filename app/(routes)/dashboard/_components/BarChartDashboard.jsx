@@ -10,7 +10,6 @@ import {
 } from "recharts";
 
 function BarChartDashboard({ budgetList }) {
-  console.log(budgetList);
   return (
     <div className="border-2 shadow-md shadow-indigo-300 rounded-lg p-5 transform transition-all ease-out duration-300 hover:scale-103 hover:shadow-lg">
       <h2 className="font-bold text-lg mb-4">Spending Breakdown for Budget Types</h2>
