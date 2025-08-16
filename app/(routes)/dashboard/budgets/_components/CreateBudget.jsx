@@ -48,7 +48,7 @@ function CreateBudget({refreshData}) {
     <div>
       <Dialog>
         <DialogTrigger asChild>
-          <div className="transform ease-out shadow-md hover:scale-102 bg-slate-100 p-10 rounded-md items-center flex flex-col border-2 border-dashed cursor-pointer hover:shadow-md hover:shadow-indigo-300 hover:bg-slate-200 transition-all duration-400">
+          <div className="transform ease-out shadow-md hover:scale-102 bg-slate-100 p-10 rounded-md items-center flex flex-col border-2 border-dashed cursor-pointer hover:shadow-md hover:shadow-indigo-300 hover:bg-slate-200 transition-all duration-400 h-[150px]">
             <h2 className="text-3xl">+</h2>
             <h2>New Budget Type</h2>
           </div>
