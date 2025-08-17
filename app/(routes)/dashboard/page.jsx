@@ -78,7 +78,7 @@ function Dashboard() {
           expensesList={expensesList}
           refreshData={() => getBudgetList()}/>
             <Link href={'/dashboard/expenses'}>
-            <Button className='w-full bg-indigo-600 hover:bg-indigo-600 cursor-pointer transform transition-all duration-400 hover:h-15'>View All Expenses</Button>
+            <Button className='mt-4 w-full bg-indigo-600 hover:bg-indigo-600 cursor-pointer transform transition-all duration-400 hover:h-15'>View All Expenses</Button>
             </Link>
           </div>
 
