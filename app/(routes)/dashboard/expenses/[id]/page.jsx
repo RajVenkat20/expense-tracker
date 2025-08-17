@@ -9,7 +9,7 @@ import BudgetItem from "../../budgets/_components/BudgetItem";
 import AddExpense from "../_components/AddExpense";
 import ExpenseListTable from "../_components/ExpenseListTable";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 
 import {
   AlertDialog,
@@ -88,7 +88,10 @@ function ExpenseScreen({ params }) {
   return (
     <div className="p-10">
       <h2 className="text-3xl font-bold text-shadow-md flex justify-between items-center">
-        My Expenses
+        <span className='flex gap-2 items-center'> 
+        <ArrowLeft onClick={()=>route.back()} className='cursor-pointer'/>
+          My Expenses
+          </span> 
         <div className="flex gap-3 items-center">
           <EditBudget budgetInfo={budgetInfo}
            refreshData={() => getBudgetInfo()}/>
