@@ -39,7 +39,7 @@ function AddExpense({ budgetId, user, refreshData }) {
   };
 
   return (
-    <div className="border p-5 rounded-lg transform ease-out hover:scale-102 hover:shadow-lg hover:shadow-indigo-300 transition-all duration-400">
+    <div className="border p-5 shadow-md shadow-indigo-300 rounded-lg transform ease-out hover:scale-102 hover:shadow-lg  transition-all duration-400">
       <h2 className="font-bold text-lg">Add Expense</h2>
       <div className="mt-4">
         <h2 className="text-black font-md my-1">Expense Name</h2>
