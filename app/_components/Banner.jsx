@@ -21,13 +21,6 @@ function Banner() {
             >
               Get Started
             </a>
-
-            {/* <a
-              className="inline-block rounded border border-gray-200 px-5 py-3 font-medium text-gray-700 shadow-md transition-colors hover:bg-gray-50 hover:text-gray-900"
-              href="#"
-            >
-              Learn More
-            </a> */}
           </div>
         </div>
       </div>
