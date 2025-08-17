@@ -2,29 +2,41 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { db } from "@/utils/dbConfig";
 import { Budgets, Expenses } from "@/utils/schema";
+import { Loader } from "lucide-react";
 import moment from "moment";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
-function AddExpense({budgetId, user, refreshData}) {
+function AddExpense({ budgetId, user, refreshData }) {
+  const [name, setName] = useState();
+  const [amount, setAmount] = useState();
+  const [loading, setLoading] = useState(false);
 
-    const [name, setName] = useState();
-    const [amount, setAmount] = useState();
+  // Function to add a new expense for a specified budget type
+  const addNewExpense = async () => {
+    setLoading(true);
+    const result = await db
+      .insert(Expenses)
+      .values({
+        name: name,
+        amount: amount,
+        budgetId: budgetId,
+        createdAt: moment().format("MM/DD/YYYY"),
+      })
+      .returning({ insertedId: Budgets.id });
 
-    const addNewExpense = async() => {
-      const result = await db.insert(Expenses).values({
-        name : name,
-        amount : amount,
-        budgetId : budgetId,
-        createdAt : moment().format('MM/DD/YYYY')
-      }).returning({insertedId : Budgets.id})
+    setAmount("");
+    setName("");
 
-      if(result)
-      {
-        refreshData()
-        toast('New Expense Added Successfully')
-      }
+    if (result) {
+      setLoading(false);
+      refreshData();
+      toast.success("Expense Added Successfully!", {
+        className: "text-green-600 font-semibold",
+      });
     }
+    setLoading(false);
+  };
 
   return (
     <div className="border p-5 rounded-lg transform ease-out hover:scale-102 hover:shadow-lg hover:shadow-indigo-300 transition-all duration-400">
@@ -33,6 +45,7 @@ function AddExpense({budgetId, user, refreshData}) {
         <h2 className="text-black font-md my-1">Expense Name</h2>
         <Input
           placeholder="e.g. Starbucks Coffee"
+          value={name}
           onChange={(e) => setName(e.target.value)}
         />
       </div>
@@ -40,12 +53,17 @@ function AddExpense({budgetId, user, refreshData}) {
         <h2 className="text-black font-md my-1">Expense Amount</h2>
         <Input
           placeholder="e.g. $10"
+          value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
       </div>
-      <Button disabled={!(name && amount)} 
-      onClick={() => addNewExpense()}
-      className='mt-4 w-full bg-indigo-600 hover:bg-indigo-600 hover:animate-pulse transition-all duration-400'>Add New Expense</Button>
+      <Button
+        disabled={!(name && amount) || loading}
+        onClick={() => addNewExpense()}
+        className="mt-4 w-full bg-indigo-600 hover:bg-indigo-600 hover:animate-pulse transition-all duration-400"
+      >
+        {loading ? <Loader className="animate-spin" /> : "Add New Expense"}
+      </Button>
     </div>
   );
 }

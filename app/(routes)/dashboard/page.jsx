@@ -9,6 +9,8 @@ import { Budgets, Expenses } from "@/utils/schema";
 import BarChartDashboard from "./_components/BarChartDashboard";
 import BudgetItem from "./budgets/_components/BudgetItem";
 import ExpenseListTable from "./expenses/_components/ExpenseListTable";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 function Dashboard() {
   const { user } = useUser();
@@ -66,18 +68,23 @@ function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 mt-6 gap-5">
         <div className="md:col-span-2">
           <BarChartDashboard budgetList={budgetList} />
-          <div className="mt-5 border-2 shadow-md shadow-indigo-300 rounded-lg p-5 transform transition-all ease-out duration-300 hover:scale-103 hover:shadow-lg">
-            <h2 className="font-bold text-lg mb-4">All Expenses</h2>
+          
+        </div>
+        <div className="grid">
+          <div className="border-2 shadow-md shadow-indigo-300 rounded-lg p-5 transform transition-all ease-out duration-300 hover:scale-103 hover:shadow-lg">
+            <h2 className="font-bold text-lg mb-4">Recent Expenses</h2>
+            {/* Query needs to be modified to only fetch recent 5 transactions */}
             <ExpenseListTable
           expensesList={expensesList}
           refreshData={() => getBudgetList()}/>
+            <Link href={'/dashboard/expenses'}>
+            <Button className='w-full bg-indigo-600 hover:bg-indigo-600 cursor-pointer transform transition-all duration-400 hover:h-15'>View All Expenses</Button>
+            </Link>
           </div>
-        </div>
-        <div className="grid">
-          {/* <h2 className="font-bold text-lg">Budget Types</h2> */}
-          {budgetList.map((budget, idx) => (
+
+          {/* {budgetList.map((budget, idx) => (
             <BudgetItem budget={budget} key={idx} />
-          ))}
+          ))} */}
         </div>
       </div>
     </div>

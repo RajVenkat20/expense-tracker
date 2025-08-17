@@ -40,7 +40,9 @@ function CreateBudget({refreshData}) {
 
     if (result) {
       refreshData()
-      toast("New Budget Created!");
+      toast.success("New Budget Created!", {
+        className: 'text-green-600 font-semibold'
+      });
     }
   };
 

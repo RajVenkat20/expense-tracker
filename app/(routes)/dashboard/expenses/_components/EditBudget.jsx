@@ -46,7 +46,9 @@ function EditBudget({budgetInfo, refreshData}) {
     if(result)
     {
         refreshData()
-        toast('Budget Type edited successfully!')
+        toast.success('Budget Type Edited Successfully!',{
+        className: 'text-green-600 font-semibold'
+      })
     }
   };
 

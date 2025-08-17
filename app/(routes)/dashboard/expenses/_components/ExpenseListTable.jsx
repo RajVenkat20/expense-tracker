@@ -25,7 +25,9 @@ function ExpenseListTable({ expensesList, refreshData }) {
       .returning();
 
     if (result) {
-      toast("Expense Deleted!");
+      toast.success("Expense Deleted!", {
+        className: 'text-green-600 font-semibold'
+      });
       refreshData();
     }
   };
