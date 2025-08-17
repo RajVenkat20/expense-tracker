@@ -59,7 +59,7 @@ function Dashboard() {
   return (
     <div className="p-8">
       <h2 className="font-bold text-3xl">
-        Hi, <strong className="text-indigo-600">{user?.fullName}</strong> ✌️
+        Hey, <span className="text-indigo-600">{user?.firstName}!</span> ✌️
       </h2>
       <p className="text-gray-500 mt-2">
         Here's what's happening with your money!

@@ -3,11 +3,12 @@
 import { LayoutGrid, PiggyBank, ReceiptText, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect } from "react";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 function SideNav() {
+  const {user} = useUser();
   const menuList = [
     {
       id: 1,
@@ -27,24 +28,27 @@ function SideNav() {
       icon: ReceiptText,
       path: "/dashboard/expenses",
     },
-    {
-      id: 4,
-      name: "Upgrade",
-      icon: ShieldCheck,
-      path: "/dashboard/upgrade",
-    },
+    // {
+    //   id: 4,
+    //   name: "Upgrade",
+    //   icon: ShieldCheck,
+    //   path: "/dashboard/upgrade",
+    // },
   ];
 
   const path = usePathname();
 
   return (
     <div className="h-screen p-5 border shadow-md">
-      <Image src={"/logo.svg"} alt="PennyPilot Logo" width={50} height={50} />
+      <div className="flex gap-2 items-center just pl-4 pr-4 border-bottom">
+        <Image src={"/logo.svg"} alt="PennyPilot Logo" width={50} height={50} />
+        <h2 className="text-2xl font-bold text-indigo-600">PennyPilot</h2>
+      </div>
       <div className="mt-5">
         {menuList.map((menu, idx) => (
           <Link href={menu.path} key={idx}>
             <h2
-              className={`flex gap-2 items-center text-gray-700 font-medium mb-3 p-5 cursor-pointer rounded-md hover:text-indigo-700 hover:bg-blue-100 hover:shadow-md transition-all duration-400 ${
+              className={`flex gap-2 items-center text-gray-700 font-medium mb-3 p-5 cursor-pointer rounded-md hover:text-indigo-700 hover:bg-blue-100 hover:shadow-lg transition-all duration-400 ${
                 path == menu.path && "text-indigo-700 bg-blue-100"
               }`}
             >
@@ -54,9 +58,9 @@ function SideNav() {
           </Link>
         ))}
       </div>
-      <div className="fixed bottom-10 p-5 flex gap-2 items-center">
+      <div className="fixed bottom-10 p-3 flex gap-3 items-center">
         <UserButton />
-        Profile
+        {user.firstName}
       </div>
     </div>
   );
