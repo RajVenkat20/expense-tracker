@@ -34,10 +34,12 @@ function SideNav() {
 
   return (
     <div className="h-screen p-5 border shadow-md">
+      <Link href={'/dashboard'}>
       <div className="flex gap-2 items-center just pl-4 pr-4 border-bottom">
         <Image src={"/logo.svg"} alt="PennyPilot Logo" width={50} height={50} />
         <h2 className="text-2xl font-bold text-indigo-600">PennyPilot</h2>
       </div>
+      </Link>
       <div className="mt-5">
         {menuList.map((menu, idx) => (
           <Link href={menu.path} key={idx}>
@@ -54,7 +56,7 @@ function SideNav() {
       </div>
       <div className="fixed bottom-10 p-3 flex gap-3 items-center">
         <UserButton />
-        {user?.firstName}
+        <span className="text-lg text-indigo-600 animate-pulse">{user?.firstName}</span>
       </div>
     </div>
   );
