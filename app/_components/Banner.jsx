@@ -1,7 +1,13 @@
+"use client"
+
 import Image from "next/image";
 import React from "react";
+import { useUser } from "@clerk/nextjs";
 
 function Banner() {
+  const { isLoaded, isSignedIn } = useUser();
+  const href = isLoaded && isSignedIn ? "/dashboard" : "/sign-in";
+
   return (
     <section className="bg-white lg:grid flex items-center flex-col">
       <div className="mx-auto w-screen max-w-screen-xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-32">
@@ -17,7 +23,7 @@ function Banner() {
           <div className="mt-4 flex justify-center gap-4 sm:mt-6">
             <a
               className="inline-block rounded-lg border bg-indigo-600 px-5 py-3 font-medium text-white shadow-lg transition-all transform ease-out duration-400 hover:scale-110 hover:bg-indigo-700"
-              href="/sign-in"
+              href={href}
             >
               Get Started
             </a>
