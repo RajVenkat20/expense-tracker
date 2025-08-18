@@ -22,7 +22,7 @@ function DashboardHeader() {
         </p>
       </div>
       <div>
-        <UserButton />
+        <UserButton appearance={{ elements: { avatarBox: "h-10 w-10" } }}/>
       </div>
     </div>
   );
