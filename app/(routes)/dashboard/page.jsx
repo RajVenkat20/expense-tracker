@@ -58,12 +58,12 @@ function Dashboard() {
 
   return (
     <div className="p-8">
-      <h2 className="font-bold text-3xl">
+      {/* <h2 className="font-bold text-3xl">
         Hey, <span className="text-indigo-600">{user?.firstName}!</span> ✌️
       </h2>
       <p className="text-gray-500 mt-2">
         Here's what's happening with your money!
-      </p>
+      </p> */}
       <CardInfo budgetList={budgetList} />
       <div className="grid grid-cols-1 md:grid-cols-3 mt-6 gap-5">
         <div className="md:col-span-2">
