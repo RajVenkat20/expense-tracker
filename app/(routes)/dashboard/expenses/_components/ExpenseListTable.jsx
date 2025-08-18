@@ -28,14 +28,19 @@ function ExpenseListTable({ expensesList = [], isLoading = false, refreshData })
     }
   };
 
+  const hasRows = Array.isArray(expensesList) && expensesList.length > 0;
+  const showHeader = !isLoading && hasRows;
+
   return (
     <div className="mt-3">
-      <div className="font-bold grid grid-cols-4 bg-slate-200 p-4 rounded-lg">
-        <h2>Name</h2>
-        <h2>Amount</h2>
-        <h2>Date</h2>
-        <h2>Action</h2>
-      </div>
+      {showHeader && (
+        <div className="font-bold grid grid-cols-4 bg-slate-200 p-4 rounded-lg">
+          <h2>Name</h2>
+          <h2>Amount</h2>
+          <h2>Date</h2>
+          <h2>Action</h2>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="mt-4 space-y-3">
@@ -47,7 +52,7 @@ function ExpenseListTable({ expensesList = [], isLoading = false, refreshData })
             <span className="text-xs">Loading recent expenses…</span>
           </div>
         </div>
-      ) : expensesList.length === 0 ? (
+      ) : !hasRows ? (
         <div className="mt-4 flex flex-col items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 py-10 text-center">
           <ReceiptText className="h-6 w-6 text-indigo-500 mb-2" />
           <p className="text-sm font-medium text-gray-700">No recent expenses</p>
