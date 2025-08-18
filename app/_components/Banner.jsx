@@ -38,12 +38,12 @@ function Banner() {
                 Get Started
               </a>
 
-              <a
+              {/* <a
                 href="#features"
                 className="inline-block rounded-xl border border-indigo-200 bg-white px-6 py-3 font-medium text-indigo-700 transform ease-out transition-all duration-400 hover:border-indigo-300 hover:bg-indigo-50 hover:scale-[1.10]"
               >
                 See Demo
-              </a>
+              </a> */}
             </div>
 
             <p className="mt-3 text-sm text-gray-500">
