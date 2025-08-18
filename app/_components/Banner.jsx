@@ -30,39 +30,39 @@ function Banner() {
               decisions — all in one simple, intuitive app.
             </p>
 
-            <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+            <div className="mt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
               <a
                 href={href}
-                className="inline-block rounded-xl bg-indigo-600 px-6 py-3 font-medium text-white shadow-lg transition-transform duration-200 hover:scale-[1.03] hover:bg-indigo-700"
+                className="inline-block rounded-xl bg-indigo-600 px-6 py-3 font-medium text-white shadow-lg transform transition-all ease-out duration-400 hover:scale-[1.10] hover:bg-indigo-700"
               >
                 Get Started
               </a>
 
               <a
                 href="#features"
-                className="inline-block rounded-xl border border-indigo-200 bg-white px-6 py-3 font-medium text-indigo-700 transition-colors duration-200 hover:border-indigo-300 hover:bg-indigo-50"
+                className="inline-block rounded-xl border border-indigo-200 bg-white px-6 py-3 font-medium text-indigo-700 transform ease-out transition-all duration-400 hover:border-indigo-300 hover:bg-indigo-50 hover:scale-[1.10]"
               >
                 See Demo
               </a>
             </div>
 
             <p className="mt-3 text-sm text-gray-500">
-              No credit card needed • Free to try • Cancel anytime
+              No in-app purchases • Free to use  
             </p>
 
             {/* Quick stats (optional; tweak numbers or remove) */}
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6 lg:justify-start">
-              <div className="rounded-2xl bg-white/70 px-4 py-3 shadow-sm ring-1 ring-gray-100">
+              <div className="rounded-2xl bg-white/70 px-4 py-3 shadow-lg ring-1 ring-gray-100">
                 <p className="text-2xl font-semibold text-gray-900">+$1,200</p>
                 <p className="text-xs text-gray-500">Avg. yearly savings*</p>
               </div>
-              <div className="rounded-2xl bg-white/70 px-4 py-3 shadow-sm ring-1 ring-gray-100">
+              <div className="rounded-2xl bg-white/70 px-4 py-3 shadow-lg ring-1 ring-gray-100 ">
                 <p className="text-2xl font-semibold text-gray-900">3 mins</p>
                 <p className="text-xs text-gray-500">to create first budget</p>
               </div>
-              <div className="rounded-2xl bg-white/70 px-4 py-3 shadow-sm ring-1 ring-gray-100">
-                <p className="text-2xl font-semibold text-gray-900">AES-256</p>
-                <p className="text-xs text-gray-500">bank-level security</p>
+              <div className="rounded-2xl bg-white/70 px-4 py-3 shadow-lg ring-1 ring-gray-100">
+                <p className="text-2xl font-semibold text-gray-900">Private</p>
+                <p className="text-xs text-gray-500">Your data stays yours</p>
               </div>
             </div>
           </div>
@@ -94,10 +94,10 @@ function Banner() {
         </div>
       </div>
 
-      {/* FEATURES */}
+      {/* APP FEATURES */}
       <div id="features" className="relative mx-auto max-w-screen-xl px-4 pb-20 sm:px-6 lg:px-8">
         <div className="grid gap-8 sm:grid-cols-3 text-center">
-          <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100 transition-transform duration-200 hover:scale-[1.01]">
+          <div className="rounded-2xl bg-white p-6 shadow-md shadow-indigo-300 ring-1 ring-gray-100 transition-all transform ease-out duration-400 hover:scale-[1.05] hover:shadow-lg">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-2xl">
               💰
             </div>
@@ -107,7 +107,7 @@ function Banner() {
             </p>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100 transition-transform duration-200 hover:scale-[1.01]">
+          <div className="rounded-2xl bg-white p-6 shadow-md shadow-indigo-300 ring-1 ring-gray-100 transition-all transform ease-out duration-400 hover:scale-[1.05] hover:shadow-lg">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-2xl">
               📊
             </div>
@@ -117,7 +117,7 @@ function Banner() {
             </p>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100 transition-transform duration-200 hover:scale-[1.01]">
+          <div className="rounded-2xl bg-white p-6 shadow-md shadow-indigo-300 ring-1 ring-gray-100 transition-all transform ease-out duration-400 hover:scale-[1.05] hover:shadow-lg">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-2xl">
               🔒
             </div>
