@@ -4,6 +4,7 @@ import {
   ClerkProvider
 } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from '@vercel/analytics/next';
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -18,7 +19,9 @@ export default function RootLayout({ children }) {
       <html lang="en">
         <body className={outfit.className}>
           <Toaster/>
-          {children}</body>
+          {children}
+          <Analytics />
+          </body>
       </html>
     </ClerkProvider>
   );
