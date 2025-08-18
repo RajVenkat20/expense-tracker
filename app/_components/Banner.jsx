@@ -53,15 +53,15 @@ function Banner() {
             {/* Quick stats (optional; tweak numbers or remove) */}
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6 lg:justify-start">
               <div className="rounded-2xl bg-white/70 px-4 py-3 shadow-lg ring-1 ring-gray-100">
-                <p className="text-2xl font-semibold text-gray-900">+$1,200</p>
+                <p className="text-2xl font-semibold text-indigo-600">+$1,200</p>
                 <p className="text-xs text-gray-500">Avg. yearly savings*</p>
               </div>
               <div className="rounded-2xl bg-white/70 px-4 py-3 shadow-lg ring-1 ring-gray-100 ">
-                <p className="text-2xl font-semibold text-gray-900">3 mins</p>
-                <p className="text-xs text-gray-500">to create first budget</p>
+                <p className="text-2xl font-semibold text-indigo-600">~3 mins</p>
+                <p className="text-xs text-gray-500">To create first budget</p>
               </div>
               <div className="rounded-2xl bg-white/70 px-4 py-3 shadow-lg ring-1 ring-gray-100">
-                <p className="text-2xl font-semibold text-gray-900">Private</p>
+                <p className="text-2xl font-semibold text-indigo-600">Private</p>
                 <p className="text-xs text-gray-500">Your data stays yours</p>
               </div>
             </div>
