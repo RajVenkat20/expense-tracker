@@ -75,7 +75,7 @@ function Dashboard() {
   return (
     <div className="p-8">
       {/* Summary cards */}
-      <CardInfo budgetList={budgetList} />
+      {showViewAllExpenses && (<CardInfo budgetList={budgetList} />)}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 mt-6 gap-5 items-stretch">
         {/* Left: Bar chart */}
