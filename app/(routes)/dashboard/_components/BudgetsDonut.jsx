@@ -7,39 +7,52 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Loader2, ChartPie } from "lucide-react";
+import Link from "next/link";
 
-/**
- * Donut chart for Budget allocation by category.
- * Expects budgetList = [{ name, amount, ... }, ...]
- */
-function BudgetsDonut({ budgetList = [] }) {
-  // shadcn provides 5 chart color tokens out of the box. Cycle through them.
-  const COLORS = [
-    // "#eef2ff", //indigo-50
-    // "#e0e7ff", //indigo-100
-    "#c7d2fe",
-    "#a5b4fc",
-    "#818cf8",
-    "#6366f1",
-    "#4f46e5",
-    "#4338ca",
-    "#3730a3",
-    "#312e81",
-  ];
+function BudgetsDonut({ budgetList = [], isLoading = false }) {
+  const COLORS = ["#c7d2fe","#a5b4fc","#818cf8","#6366f1","#4f46e5","#4338ca","#3730a3","#312e81"];
+
+  // Loading UI (keeps size to avoid layout shift)
+  if (isLoading) {
+    return (
+      <ChartContainer className="mx-auto aspect-square max-h-[320px]" config={{}}>
+        <div className="flex h-full w-full items-center justify-center gap-2">
+          <Loader2 className="h-5 w-5 animate-spin text-indigo-600" />
+          <span className="text-sm text-gray-600">Loading your data…</span>
+        </div>
+      </ChartContainer>
+    );
+  }
 
   const data = (budgetList || []).map((b, i) => ({
     name: b.name,
     value: Number(b.amount ?? 0),
     fill: COLORS[i % COLORS.length],
   }));
-
   const total = data.reduce((sum, d) => sum + (d.value || 0), 0);
 
-  if (!data.length) {
+  const hasRows = Array.isArray(data) && data.length > 0;
+  const hasNonZero = hasRows && data.some(d => Number(d.value) > 0);
+
+  // Friendlier empty state (no rows OR all zeros)
+  if (!hasNonZero) {
     return (
-      <div className="flex h-48 items-center justify-center text-sm text-gray-500">
-        No budgets yet
-      </div>
+      <ChartContainer className="mx-auto aspect-square max-h-[320px]" config={{}}>
+        <div className="flex h-full w-full flex-col items-center justify-center rounded-md border border-dashed border-indigo-200 bg-indigo-50/30 p-6 text-center">
+          <ChartPie className="h-6 w-6 text-indigo-500 mb-2" />
+          <p className="text-sm font-medium text-gray-700">No budget breakdown yet</p>
+          <p className="text-xs text-gray-500 mt-1">
+            Create a budget or assign amounts to see your distribution.
+          </p>
+          <Link
+            href="/dashboard/budgets"
+            className="mt-3 inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
+          >
+            Create Budget
+          </Link>
+        </div>
+      </ChartContainer>
     );
   }
 
@@ -59,7 +72,6 @@ function BudgetsDonut({ budgetList = [] }) {
             <Cell key={idx} fill={entry.fill} />
           ))}
 
-          {/* Center label */}
           <Label
             content={({ viewBox }) => {
               if (viewBox && "cx" in viewBox && "cy" in viewBox) {
@@ -88,10 +100,7 @@ function BudgetsDonut({ budgetList = [] }) {
           />
         </Pie>
 
-        <ChartTooltip
-          cursor={false}
-          content={<ChartTooltipContent hideLabel />}
-        />
+        <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
       </PieChart>
     </ChartContainer>
   );
