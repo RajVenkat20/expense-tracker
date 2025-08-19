@@ -22,6 +22,7 @@ function AddExpense({ budgetId, user, refreshData }) {
         amount: amount,
         budgetId: budgetId,
         createdAt: moment().format("YYYY-MM-DD"),
+        createdBy: user.primaryEmailAddress.emailAddress
       })
       .returning({ insertedId: Budgets.id });
 
