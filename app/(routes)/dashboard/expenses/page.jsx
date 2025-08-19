@@ -47,14 +47,12 @@ function ExpensesScreen() {
           .offset(offset),
 
         db
-          .select({ count: sql<Number>`count(*)` })
+          .select({ count: sql < Number > `count(*)` })
           .from(Expenses)
           .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId))
           .where(eq(Budgets.createdBy, email)),
       ]);
 
-      
-      // const total = Number(countRows?.[0]?.count ?? 0);
       const total = countRows.length > 0 ? countRows.length : 0;
 
       // If current page is out of range (e.g., after deletions), jump to last valid page
@@ -99,7 +97,9 @@ function ExpensesScreen() {
         {totalCount > 0 && (
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-gray-500">
-              Showing <span className="font-medium text-indigo-600">{start}</span>–<span className="font-medium text-indigo-600">{end}</span> of{" "}
+              Showing{" "}
+              <span className="font-medium text-indigo-600">{start}</span>–
+              <span className="font-medium text-indigo-600">{end}</span> of{" "}
               <span className="font-medium text-indigo-600">{totalCount}</span>
             </p>
 
@@ -116,8 +116,11 @@ function ExpensesScreen() {
               </Button>
 
               <span className="text-sm text-gray-600 mx-2">
-                Page <span className="font-medium text-indigo-600">{page}</span> of{" "}
-                <span className="font-medium text-indigo-600">{totalPages}</span>
+                Page <span className="font-medium text-indigo-600">{page}</span>{" "}
+                of{" "}
+                <span className="font-medium text-indigo-600">
+                  {totalPages}
+                </span>
               </span>
 
               <Button
