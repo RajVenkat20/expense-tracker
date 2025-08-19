@@ -2,7 +2,16 @@
 
 import { db } from "@/utils/dbConfig";
 import { Budgets, Expenses } from "@/utils/schema";
-import { desc, eq, sql } from "drizzle-orm";
+import {
+  and,
+  between,
+  desc,
+  eq,
+  gte,
+  ilike,
+  lte,
+  sql,
+} from "drizzle-orm";
 import React, { useEffect, useState } from "react";
 import ExpenseListTable from "./_components/ExpenseListTable";
 import { useUser } from "@clerk/nextjs";
@@ -19,56 +28,108 @@ function ExpensesScreen() {
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
-  // --- SEARCH/FILTER UI STATE (UI only for now) ---
+  // --- SEARCH/FILTER UI STATE ---
   const [query, setQuery] = useState("");
   const [amountMin, setAmountMin] = useState("");
   const [amountMax, setAmountMax] = useState("");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
+  const [dateFrom, setDateFrom] = useState(""); // expected YYYY-MM-DD
+  const [dateTo, setDateTo] = useState("");     // expected YYYY-MM-DD
+
+  // Persisted criteria to reuse across pagination
+  const [searchCriteria, setSearchCriteria] = useState({
+    query: "",
+    amountMin: "",
+    amountMax: "",
+    dateFrom: "",
+    dateTo: "",
+  });
 
   const { user } = useUser();
   const route = useRouter();
 
   useEffect(() => {
-    if (user) getAllExpenses(1);
+    if (user) {
+      // initial load with empty criteria
+      getAllExpenses(1, searchCriteria);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  // Fetch a page of expenses + total count
-  const getAllExpenses = async (pageArg = 1) => {
+  // Build a WHERE expression based on criteria
+  const buildWhere = (email, criteria) => {
+    const conds = [eq(Budgets.createdBy, email)];
+
+    // name contains (case-insensitive)
+    if (criteria.query && criteria.query.trim() !== "") {
+      // ilike expects a pattern with % wildcards
+      conds.push(ilike(Expenses.name, `%${criteria.query.trim()}%`));
+    }
+
+    // amount filters
+    const minVal = criteria.amountMin !== "" ? Number(criteria.amountMin) : null;
+    const maxVal = criteria.amountMax !== "" ? Number(criteria.amountMax) : null;
+
+    if (minVal != null && !Number.isNaN(minVal) &&
+        maxVal != null && !Number.isNaN(maxVal)) {
+      conds.push(between(Expenses.amount, minVal, maxVal));
+    } else if (minVal != null && !Number.isNaN(minVal)) {
+      conds.push(gte(Expenses.amount, minVal));
+    } else if (maxVal != null && !Number.isNaN(maxVal)) {
+      conds.push(lte(Expenses.amount, maxVal));
+    }
+
+    // date range filters (works best if createdAt is DATE or ISO string)
+    const from = criteria.dateFrom && criteria.dateFrom.trim() !== "" ? criteria.dateFrom : null;
+    const to = criteria.dateTo && criteria.dateTo.trim() !== "" ? criteria.dateTo : null;
+
+    if (from && to) {
+      conds.push(between(Expenses.createdAt, from, to));
+    } else if (from) {
+      conds.push(gte(Expenses.createdAt, from));
+    } else if (to) {
+      conds.push(lte(Expenses.createdAt, to));
+    }
+
+    return and(...conds);
+  };
+
+  // Fetch a page of expenses + total count (with filters)
+  const getAllExpenses = async (pageArg = 1, criteria = searchCriteria) => {
     setIsAllLoading(true);
     try {
       const email = user?.primaryEmailAddress?.emailAddress ?? "";
       const offset = (pageArg - 1) * PAGE_SIZE;
+      const whereExpr = buildWhere(email, criteria);
 
-      const [rows, countRows] = await Promise.all([
-        db
-          .select({
-            id: Expenses.id,
-            name: Expenses.name,
-            amount: Expenses.amount,
-            createdAt: Expenses.createdAt,
-          })
-          .from(Expenses)
-          .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId)) // query from Expenses
-          .where(eq(Budgets.createdBy, email))
-          .orderBy(desc(Expenses.id))
-          .limit(PAGE_SIZE)
-          .offset(offset),
+      // rows
+      const rowsPromise = db
+        .select({
+          id: Expenses.id,
+          name: Expenses.name,
+          amount: Expenses.amount,
+          createdAt: Expenses.createdAt,
+        })
+        .from(Expenses)
+        .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId))
+        .where(whereExpr)
+        .orderBy(desc(Expenses.id))
+        .limit(PAGE_SIZE)
+        .offset(offset);
 
-        db
-          .select({ count: sql`count(*)` }) // JSX-safe; coerce to Number below
-          .from(Expenses)
-          .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId))
-          .where(eq(Budgets.createdBy, email)),
-      ]);
+      // total count
+      const countPromise = db
+        .select({ count: sql`count(*)` })
+        .from(Expenses)
+        .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId))
+        .where(whereExpr);
 
+      const [rows, countRows] = await Promise.all([rowsPromise, countPromise]);
       const total = Number(countRows?.[0]?.count ?? 0);
 
-      // If current page is out of range (e.g., after deletions), jump to last valid page
+      // Adjust page if out of range (e.g., after deletes/filters)
       const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
       if (pageArg > totalPages && total > 0) {
-        return getAllExpenses(totalPages);
+        return getAllExpenses(totalPages, criteria);
       }
 
       setExpensesList(rows);
@@ -79,17 +140,13 @@ function ExpensesScreen() {
     }
   };
 
-  // --- UI handlers (no backend calls yet) ---
+  // --- UI handlers ---
   const handleSearch = (e) => {
     e?.preventDefault();
-    console.log("SEARCH CRITERIA ->", {
-      query,
-      amountMin,
-      amountMax,
-      dateFrom,
-      dateTo,
-    });
-    // Later: call getAllExpenses(1) and apply these in your DB WHERE clause.
+    const next = { query, amountMin, amountMax, dateFrom, dateTo };
+    setSearchCriteria(next);
+    console.log("SEARCH CRITERIA ->", next);
+    getAllExpenses(1, next);
   };
 
   const handleClear = () => {
@@ -98,7 +155,10 @@ function ExpensesScreen() {
     setAmountMax("");
     setDateFrom("");
     setDateTo("");
+    const cleared = { query: "", amountMin: "", amountMax: "", dateFrom: "", dateTo: "" };
+    setSearchCriteria(cleared);
     console.log("SEARCH CRITERIA CLEARED");
+    getAllExpenses(1, cleared);
   };
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -230,7 +290,7 @@ function ExpensesScreen() {
 
       <div className="mt-5 border-2 shadow-md shadow-indigo-300 rounded-lg p-5">
         <ExpenseListTable
-          refreshData={() => getAllExpenses(page)} // keep current page after deletes
+          refreshData={() => getAllExpenses(page, searchCriteria)} // keep filters on refresh
           expensesList={expensesList}
           isLoading={isAllLoading}
           emptyTitle="No expenses yet"
@@ -251,7 +311,7 @@ function ExpensesScreen() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => getAllExpenses(page - 1)}
+                onClick={() => getAllExpenses(page - 1, searchCriteria)}
                 disabled={!canPrev}
                 className="gap-1 text-indigo-600 ease-out transform transition-all duration-400 hover:bg-blue-100 hover:scale-[1.05] hover:shadow-lg hover:shadow-indigo-300"
               >
@@ -270,7 +330,7 @@ function ExpensesScreen() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => getAllExpenses(page + 1)}
+                onClick={() => getAllExpenses(page + 1, searchCriteria)}
                 disabled={!canNext}
                 className="gap-1 text-indigo-600 ease-out transform transition-all duration-400 hover:bg-blue-100 hover:scale-[1.05] hover:shadow-lg hover:shadow-indigo-300"
               >
