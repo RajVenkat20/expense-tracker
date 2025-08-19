@@ -8,6 +8,13 @@
       "when": 1755106620428,
       "tag": "0000_first_champions",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1755635704912,
+      "tag": "0001_aromatic_the_initiative",
+      "breakpoints": true
     }
   ]
 }
