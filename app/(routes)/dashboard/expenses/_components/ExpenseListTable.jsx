@@ -1,5 +1,4 @@
 "use client";
-
 import { db } from "@/utils/dbConfig";
 import { Expenses } from "@/utils/schema";
 import { eq } from "drizzle-orm";
@@ -19,7 +18,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-function ExpenseListTable({ expensesList = [], isLoading = false, refreshData }) {
+function ExpenseListTable({
+  expensesList = [],
+  isLoading = false,
+  refreshData,
+  emptyTitle = "No recent expenses",         // 👈 defaults (used on Dashboard)
+  emptySubtitle = "Add an expense and it’ll appear here.",
+}) {
   const deleteExpense = async (expense) => {
     const result = await db.delete(Expenses).where(eq(Expenses.id, expense.id)).returning();
     if (result) {
@@ -49,14 +54,14 @@ function ExpenseListTable({ expensesList = [], isLoading = false, refreshData })
           ))}
           <div className="mt-2 flex items-center gap-2 text-gray-600">
             <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
-            <span className="text-xs">Loading recent expenses…</span>
+            <span className="text-xs">Loading expenses…</span>
           </div>
         </div>
       ) : !hasRows ? (
         <div className="mt-4 flex flex-col items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 py-10 text-center">
           <ReceiptText className="h-6 w-6 text-indigo-500 mb-2" />
-          <p className="text-sm font-medium text-gray-700">No recent expenses</p>
-          <p className="text-xs text-gray-500 mt-1">Add an expense and it’ll appear here.</p>
+          <p className="text-sm font-medium text-gray-700">{emptyTitle}</p>
+          <p className="text-xs text-gray-500 mt-1">{emptySubtitle}</p>
         </div>
       ) : (
         expensesList.map((expenses, idx) => (
