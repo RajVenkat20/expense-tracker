@@ -179,14 +179,14 @@ function ExpensesScreen() {
       {/* SEARCH AREA */}
       <form
         onSubmit={handleSearch}
-        className="mt-5 rounded-lg border p-4 shadow-sm"
+        className="mt-5 rounded-lg border-2 p-4 shadow-md shadow-indigo-300"
       >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
           {/* Name search */}
           <div className="lg:col-span-2">
             <label
               htmlFor="search-query"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-1 block text-md font-bold text-gray-700"
             >
               Search by name
             </label>
@@ -194,6 +194,7 @@ function ExpensesScreen() {
               id="search-query"
               placeholder="e.g., Coffee, Uber..."
               value={query}
+              className="text-indigo-600"
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
@@ -202,7 +203,7 @@ function ExpensesScreen() {
           <div>
             <label
               htmlFor="amount-min"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-1 block text-sm font-bold text-gray-700"
             >
               Amount (min)
             </label>
@@ -211,6 +212,7 @@ function ExpensesScreen() {
               type="number"
               inputMode="decimal"
               placeholder="e.g., 0"
+              className="text-indigo-600"
               value={amountMin}
               onChange={(e) => setAmountMin(e.target.value)}
               min="0"
@@ -221,7 +223,7 @@ function ExpensesScreen() {
           <div>
             <label
               htmlFor="amount-max"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-1 block text-sm font-bold text-gray-700"
             >
               Amount (max)
             </label>
@@ -230,6 +232,7 @@ function ExpensesScreen() {
               type="number"
               inputMode="decimal"
               placeholder="e.g., 100"
+              className="text-indigo-600"
               value={amountMax}
               onChange={(e) => setAmountMax(e.target.value)}
               min="0"
@@ -240,13 +243,14 @@ function ExpensesScreen() {
           <div>
             <label
               htmlFor="date-from"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-1 block text-sm font-bold text-gray-700"
             >
-              Date from
+              Date From
             </label>
             <Input
               id="date-from"
               type="date"
+              className="text-indigo-600"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
             />
@@ -256,13 +260,14 @@ function ExpensesScreen() {
           <div>
             <label
               htmlFor="date-to"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-1 block text-sm font-bold text-gray-700"
             >
-              Date to
+              Date To
             </label>
             <Input
               id="date-to"
               type="date"
+              className="text-indigo-600"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
             />
@@ -270,18 +275,18 @@ function ExpensesScreen() {
         </div>
 
         {/* Actions */}
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end">
           <Button
             type="button"
             variant="outline"
             onClick={handleClear}
-            className="ease-out transform transition-all duration-300 hover:bg-gray-100 hover:scale-[1.02]"
+            className="ease-out transform transition-all duration-400 hover:shadow-lg hover:shadow-indigo-300 hover:bg-blue-100 hover:scale-[1.05] text-indigo-600 hover:text-indigo-600"
           >
             Clear
           </Button>
           <Button
             type="submit"
-            className="gap-1 ease-out transform transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-indigo-300"
+            className="gap-1 ease-out transform transition-all bg-indigo-600 duration-400 hover:scale-[1.05] hover:shadow-lg hover:shadow-indigo-300 hover:bg-indigo-700"
           >
             Search
           </Button>
