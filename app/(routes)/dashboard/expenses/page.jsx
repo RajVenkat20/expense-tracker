@@ -1,4 +1,5 @@
 "use client";
+
 import { db } from "@/utils/dbConfig";
 import { Budgets, Expenses } from "@/utils/schema";
 import { desc, eq, sql } from "drizzle-orm";
@@ -8,6 +9,7 @@ import { useUser } from "@clerk/nextjs";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const PAGE_SIZE = 10;
 
@@ -17,11 +19,19 @@ function ExpensesScreen() {
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
+  // --- SEARCH/FILTER UI STATE (UI only for now) ---
+  const [query, setQuery] = useState("");
+  const [amountMin, setAmountMin] = useState("");
+  const [amountMax, setAmountMax] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+
   const { user } = useUser();
   const route = useRouter();
 
   useEffect(() => {
     if (user) getAllExpenses(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   // Fetch a page of expenses + total count
@@ -40,20 +50,20 @@ function ExpensesScreen() {
             createdAt: Expenses.createdAt,
           })
           .from(Expenses)
-          .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId)) // ← query from Expenses
+          .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId)) // query from Expenses
           .where(eq(Budgets.createdBy, email))
           .orderBy(desc(Expenses.id))
           .limit(PAGE_SIZE)
           .offset(offset),
 
         db
-          .select({ count: sql < Number > `count(*)` })
+          .select({ count: sql`count(*)` }) // JSX-safe; coerce to Number below
           .from(Expenses)
           .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId))
           .where(eq(Budgets.createdBy, email)),
       ]);
 
-      const total = countRows.length > 0 ? countRows.length : 0;
+      const total = Number(countRows?.[0]?.count ?? 0);
 
       // If current page is out of range (e.g., after deletions), jump to last valid page
       const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -67,6 +77,28 @@ function ExpensesScreen() {
     } finally {
       setIsAllLoading(false);
     }
+  };
+
+  // --- UI handlers (no backend calls yet) ---
+  const handleSearch = (e) => {
+    e?.preventDefault();
+    console.log("SEARCH CRITERIA ->", {
+      query,
+      amountMin,
+      amountMax,
+      dateFrom,
+      dateTo,
+    });
+    // Later: call getAllExpenses(1) and apply these in your DB WHERE clause.
+  };
+
+  const handleClear = () => {
+    setQuery("");
+    setAmountMin("");
+    setAmountMax("");
+    setDateFrom("");
+    setDateTo("");
+    console.log("SEARCH CRITERIA CLEARED");
   };
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -84,13 +116,125 @@ function ExpensesScreen() {
         </span>
       </h2>
 
+      {/* SEARCH AREA */}
+      <form
+        onSubmit={handleSearch}
+        className="mt-5 rounded-lg border p-4 shadow-sm"
+      >
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
+          {/* Name search */}
+          <div className="lg:col-span-2">
+            <label
+              htmlFor="search-query"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
+              Search by name
+            </label>
+            <Input
+              id="search-query"
+              placeholder="e.g., Coffee, Uber..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+
+          {/* Amount Min */}
+          <div>
+            <label
+              htmlFor="amount-min"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
+              Amount (min)
+            </label>
+            <Input
+              id="amount-min"
+              type="number"
+              inputMode="decimal"
+              placeholder="e.g., 0"
+              value={amountMin}
+              onChange={(e) => setAmountMin(e.target.value)}
+              min="0"
+            />
+          </div>
+
+          {/* Amount Max */}
+          <div>
+            <label
+              htmlFor="amount-max"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
+              Amount (max)
+            </label>
+            <Input
+              id="amount-max"
+              type="number"
+              inputMode="decimal"
+              placeholder="e.g., 100"
+              value={amountMax}
+              onChange={(e) => setAmountMax(e.target.value)}
+              min="0"
+            />
+          </div>
+
+          {/* Date From */}
+          <div>
+            <label
+              htmlFor="date-from"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
+              Date from
+            </label>
+            <Input
+              id="date-from"
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+            />
+          </div>
+
+          {/* Date To */}
+          <div>
+            <label
+              htmlFor="date-to"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
+              Date to
+            </label>
+            <Input
+              id="date-to"
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleClear}
+            className="ease-out transform transition-all duration-300 hover:bg-gray-100 hover:scale-[1.02]"
+          >
+            Clear
+          </Button>
+          <Button
+            type="submit"
+            className="gap-1 ease-out transform transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-indigo-300"
+          >
+            Search
+          </Button>
+        </div>
+      </form>
+
       <div className="mt-5 border-2 shadow-md shadow-indigo-300 rounded-lg p-5">
         <ExpenseListTable
           refreshData={() => getAllExpenses(page)} // keep current page after deletes
           expensesList={expensesList}
           isLoading={isAllLoading}
           emptyTitle="No expenses yet"
-          emptySubtitle="Add an expense and it’ll appear here."
+          emptySubtitle="Add an expense and it'll appear here."
         />
 
         {/* Pagination */}
