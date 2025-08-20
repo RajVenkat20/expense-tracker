@@ -11,6 +11,7 @@ import ExpenseListTable from "./expenses/_components/ExpenseListTable";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import BudgetsDonut from "./_components/BudgetsDonut";
+import IncomeVsExpensesArea from "./_components/IncomevsExpensesAreaChart";
 
 function Dashboard() {
   const { user } = useUser();
@@ -75,13 +76,16 @@ function Dashboard() {
   return (
     <div className="p-8">
       {/* Summary cards */}
-      {showViewAllExpenses && (<CardInfo budgetList={budgetList} />)}
+      {showViewAllExpenses && <CardInfo budgetList={budgetList} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 mt-6 gap-5 items-stretch">
         {/* Left: Bar chart */}
         <div className="h-full">
           <div className="border-2 shadow-md shadow-indigo-300 rounded-lg p-5 h-full min-h-[420px]">
-            <BarChartDashboard budgetList={budgetList} isLoading={isBudgetLoading} />
+            <BarChartDashboard
+              budgetList={budgetList}
+              isLoading={isBudgetLoading}
+            />
           </div>
         </div>
 
@@ -97,6 +101,8 @@ function Dashboard() {
           </div>
         </div>
       </div>
+
+      <IncomeVsExpensesArea />
 
       {/* Recent Expenses card */}
       <div className="grid mt-5">
