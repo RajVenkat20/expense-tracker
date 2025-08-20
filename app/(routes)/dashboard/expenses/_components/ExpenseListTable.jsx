@@ -22,7 +22,7 @@ function ExpenseListTable({
   expensesList = [],
   isLoading = false,
   refreshData,
-  emptyTitle = "No recent expenses",         // 👈 defaults (used on Dashboard)
+  emptyTitle = "No recent expenses", // 👈 defaults (used on Dashboard)
   emptySubtitle = "Add an expense and it’ll appear here.",
 }) {
   const deleteExpense = async (expense) => {
@@ -39,7 +39,7 @@ function ExpenseListTable({
   return (
     <div className="mt-3">
       {showHeader && (
-        <div className="font-bold grid grid-cols-4 bg-slate-200 p-4 rounded-lg">
+        <div className="font-bold grid grid-cols-4 bg-slate-200 p-4 rounded-lg text-center">
           <h2>Name</h2>
           <h2>Amount</h2>
           <h2>Date</h2>
@@ -64,44 +64,53 @@ function ExpenseListTable({
           <p className="text-xs text-gray-500 mt-1">{emptySubtitle}</p>
         </div>
       ) : (
-        expensesList.map((expenses, idx) => (
-          <div
-            key={idx}
-            className="mt-4 grid grid-cols-4 bg-slate-50 p-4 rounded-lg hover:bg-slate-100 transform transition-all duration-400 ease-out hover:shadow-md"
-          >
-            <h2 className="truncate">{expenses.name}</h2>
-            <h2 className="text-indigo-600 font-bold">
-              ${Number(expenses.amount).toLocaleString()}
-            </h2>
-            <h2>{expenses.createdAt}</h2>
-            <h2 className="ml-3">
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <button aria-label="Delete expense">
-                    <Trash2 className="text-red-600 cursor-pointer" />
-                  </button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete this expense?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete the expense from the server.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-red-600"
-                      onClick={() => deleteExpense(expenses)}
-                    >
-                      Continue
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </h2>
-          </div>
-        ))
+        expensesList.map((expenses, idx) => {
+          const amt = Number(expenses.amount ?? 0);
+          const amountClass =
+            amt < 50 ? "text-green-600" : amt <= 150 ? "text-orange-500" : "text-red-600";
+
+          return (
+            <div
+              key={idx}
+              className="mt-4 grid grid-cols-4 bg-slate-50 p-4 rounded-lg hover:bg-slate-100 transform transition-all duration-400 ease-out hover:shadow-md items-center text-center"
+            >
+              <h2 className="truncate">{expenses.name}</h2>
+
+              <h2 className={`font-bold ${amountClass}`}>
+                ${amt.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+              </h2>
+
+              <h2>{expenses.createdAt}</h2>
+              <h2 className="ml-3">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button aria-label="Delete expense">
+                      <Trash2 className="text-red-600 cursor-pointer" />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete this expense?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete the expense from
+                        the server.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-red-600"
+                        onClick={() => deleteExpense(expenses)}
+                      >
+                        Continue
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </h2>
+            </div>
+          );
+        })
       )}
     </div>
   );
