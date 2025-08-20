@@ -143,7 +143,7 @@ export default function IncomeVsExpensesArea({
   // Colors: indigo-300 & indigo-500
   const chartConfig = {
     income: { label: "Income", color: "#10b981" }, // indigo-300
-    expenses: { label: "Expenses", color: "#6366f1" }, // indigo-500
+    expenses: { label: "Expenses", color: "#f43f5e" }, // indigo-500
   };
 
   return (

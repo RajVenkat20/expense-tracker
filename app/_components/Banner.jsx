@@ -72,7 +72,7 @@ function Banner() {
             {/* Replace /hero-mock.png with your actual screenshot */}
             <div className="mx-auto w-full max-w-lg overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xl">
               <Image
-                src="/hero-mock.png"
+                src="/banner.png"
                 alt="PennyPilot dashboard preview"
                 width={1200}
                 height={900}
