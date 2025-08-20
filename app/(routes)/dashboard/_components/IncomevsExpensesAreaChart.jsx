@@ -67,7 +67,7 @@ export default function IncomeVsExpensesArea({
   stacked = false, // set true if you prefer stacking
 }) {
   const { user } = useUser();
-  const [timeRange, setTimeRange] = React.useState("90d");
+  const [timeRange, setTimeRange] = React.useState("7d");
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
 
