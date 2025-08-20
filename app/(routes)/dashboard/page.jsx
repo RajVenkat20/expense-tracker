@@ -76,7 +76,7 @@ function Dashboard() {
 
   return (
     <div className="p-8">
-      <CreateIncomeExpense/>
+      {/* <CreateIncomeExpense/> */}
       {/* Summary cards */}
       {showViewAllExpenses && <CardInfo budgetList={budgetList} />}
 
