@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import BudgetsDonut from "./_components/BudgetsDonut";
 import IncomeVsExpensesArea from "./_components/IncomevsExpensesAreaChart";
+import CreateIncomeExpense from "./_components/CreateIncomeExpense";
 
 function Dashboard() {
   const { user } = useUser();
@@ -75,6 +76,7 @@ function Dashboard() {
 
   return (
     <div className="p-8">
+      <CreateIncomeExpense/>
       {/* Summary cards */}
       {showViewAllExpenses && <CardInfo budgetList={budgetList} />}
 

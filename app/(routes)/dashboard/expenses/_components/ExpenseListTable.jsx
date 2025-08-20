@@ -22,7 +22,7 @@ function ExpenseListTable({
   expensesList = [],
   isLoading = false,
   refreshData,
-  emptyTitle = "No recent expenses", // 👈 defaults (used on Dashboard)
+  emptyTitle = "No recent expenses",
   emptySubtitle = "Add an expense and it’ll appear here.",
 }) {
   const deleteExpense = async (expense) => {
@@ -67,7 +67,7 @@ function ExpenseListTable({
         expensesList.map((expenses, idx) => {
           const amt = Number(expenses.amount ?? 0);
           const amountClass =
-            amt < 50 ? "text-green-600" : amt <= 150 ? "text-orange-500" : "text-red-600";
+            amt < 50 ? "text-green-600" : amt <= 150 ? "text-orange-500" : "text-red-600 animate-pulse text-shadow-lg";
 
           return (
             <div
