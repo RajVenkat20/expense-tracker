@@ -12,7 +12,7 @@ function Budget() {
       <h2 className="font-bold text-3xl text-shadow-md">
         <span className="flex gap-2 items-center">
           <ArrowLeft onClick={() => route.back()} className="cursor-pointer" />
-          My Budget Types
+          My Expense Categories
         </span>{" "}
       </h2>
       <BudgetList />
