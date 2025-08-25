@@ -22,7 +22,8 @@ function DashboardLayout({ children }) {
 
   // persist collapse choice
   useEffect(() => {
-    const saved = typeof window !== "undefined" && localStorage.getItem("pp-nav-collapsed");
+    const saved =
+      typeof window !== "undefined" && localStorage.getItem("pp-nav-collapsed");
     if (saved != null) setCollapsed(saved === "true");
   }, []);
   useEffect(() => {
@@ -37,22 +38,36 @@ function DashboardLayout({ children }) {
     else document.body.classList.remove("overflow-hidden");
   }, [mobileOpen]);
 
+  // close by ESC
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && setMobileOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   useEffect(() => {
     user && checkUserBudgets();
   }, [user]);
 
   const checkUserBudgets = async () => {
+    const email = user?.primaryEmailAddress?.emailAddress;
+    if (!email) return;
     const result = await db
       .select()
       .from(Budgets)
-      .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress));
+      .where(eq(Budgets.createdBy, email));
     if (result.length === 0) router.replace("/dashboard/budgets");
   };
 
   return (
     <div>
       {/* Desktop sidebar */}
-      <div className={clsx("fixed hidden md:block transition-all duration-300", collapsed ? "w-16" : "w-64")}>
+      <div
+        className={clsx(
+          "fixed hidden md:block transition-all duration-300",
+          collapsed ? "w-16" : "w-64"
+        )}
+      >
         <SideNav collapsed={collapsed} setCollapsed={setCollapsed} />
       </div>
 
@@ -62,13 +77,16 @@ function DashboardLayout({ children }) {
         <div
           className={clsx(
             "fixed inset-0 z-40 bg-black/40 transition-opacity",
-            mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+            mobileOpen
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
           )}
           onClick={() => setMobileOpen(false)}
           aria-hidden="true"
         />
         {/* Panel */}
         <aside
+          id="mobile-sidebar"
           className={clsx(
             "fixed z-50 inset-y-0 left-0 w-64 bg-white shadow-xl border-r transition-transform duration-300",
             mobileOpen ? "translate-x-0" : "-translate-x-full"
@@ -77,15 +95,22 @@ function DashboardLayout({ children }) {
           aria-modal="true"
         >
           <SideNav
-            collapsed={false}            // always full width on mobile
-            setCollapsed={() => {}}      // not used on mobile
+            collapsed={false}           // full width on mobile
+            setCollapsed={() => {}}     // not used on mobile
+            onMobileClose={() => setMobileOpen(false)} // close on item click
           />
         </aside>
       </div>
 
-      {/* Main content */}
-      <div className={clsx("transition-all duration-300", "md:ml-16", !collapsed && "md:ml-64")}>
-        {/* Pass a handler to open the drawer from your header */}
+      {/* Main content (shifted on desktop based on collapse) */}
+      <div
+        className={clsx(
+          "transition-all duration-300",
+          "md:ml-16",
+          !collapsed && "md:ml-64"
+        )}
+      >
+        {/* Header with right-aligned hamburger on mobile */}
         <DashboardHeader onMenuClick={() => setMobileOpen(true)} />
         {children}
       </div>
