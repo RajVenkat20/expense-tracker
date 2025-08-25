@@ -60,12 +60,12 @@ function EditBudget({budgetInfo, refreshData}) {
         <DialogTrigger asChild>
           <Button className="flex gap-2 bg-indigo-600 hover:bg-indigo-700 transform transition-all ease-out duration-400 hover:scale-103 hover:shadow-lg">
             <PenBox />
-            Edit Budget Type
+            Edit Expense Category
           </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Budget Type</DialogTitle>
+            <DialogTitle>Edit Category</DialogTitle>
             <DialogDescription>
               <div className="mt-5 transition-all duration-400">
                 <h2 className="text-black font-md my-1">Select An Icon</h2>
@@ -86,7 +86,7 @@ function EditBudget({budgetInfo, refreshData}) {
                   />
                 </div>
                 <div className="mt-4">
-                  <h2 className="text-black font-md my-1">Budget Type Name</h2>
+                  <h2 className="text-black font-md my-1">Expense Category Name</h2>
                   <Input
                     defaultValue={name}
                     onChange={(e) => setName(e.target.value)}
@@ -110,7 +110,7 @@ function EditBudget({budgetInfo, refreshData}) {
                 onClick={() => onUpdateBudget()}
                 className="mt-10 w-full bg-indigo-600 hover:bg-indigo-700 hover:shadow-md hover:h-15 transition-all duration-400"
               >
-                Edit
+                Save Changes
               </Button>
             </DialogClose>
           </DialogFooter>
