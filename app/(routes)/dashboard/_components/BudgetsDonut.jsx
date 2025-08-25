@@ -70,7 +70,7 @@ function BudgetsDonut({ budgetList = [], isLoading = false }) {
           </p>
           <Link
             href="/dashboard/budgets"
-            className="mt-3 inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
+            className="mt-3 inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-700 transform transition-all ease-out duration-400 hover:shadow:lg hover:shadow-indigo-300 hover:scale-[1.10]"
           >
             Create Expense Category
           </Link>
