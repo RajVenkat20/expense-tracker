@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import CardInfo from "./_components/CardInfo";
 import { db } from "@/utils/dbConfig";
@@ -16,41 +16,16 @@ import CreateIncomeExpense from "./_components/CreateIncomeExpense";
 
 function Dashboard() {
   const { user } = useUser();
+  const email = user?.primaryEmailAddress?.emailAddress ?? "";
+
   const [budgetList, setBudgetList] = useState([]);
   const [isBudgetLoading, setIsBudgetLoading] = useState(true);
   const [isRecentLoading, setIsRecentLoading] = useState(true);
   const [recentExpensesList, setRecentExpensesList] = useState([]);
   const [chartRefreshKey, setChartRefreshKey] = useState(0);
 
-  useEffect(() => {
-    user && getBudgetList();
-  }, [user]);
-
-  // Budgets (and triggers recent expenses)
-  const getBudgetList = async () => {
-    setIsBudgetLoading(true);
-    try {
-      const result = await db
-        .select({
-          ...getTableColumns(Budgets),
-          totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
-          totalItem: sql`count(${Expenses.id})`.mapWith(Number),
-        })
-        .from(Budgets)
-        .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-        .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress))
-        .groupBy(Budgets.id)
-        .orderBy(desc(Budgets.id));
-
-      setBudgetList(result);
-      getRecentExpenses();
-    } finally {
-      setIsBudgetLoading(false);
-    }
-  };
-
-  // Recent 5 expenses
-  const getRecentExpenses = async () => {
+  const getRecentExpenses = useCallback(async () => {
+    if (!email) return;
     setIsRecentLoading(true);
     try {
       const result = await db
@@ -62,7 +37,7 @@ function Dashboard() {
         })
         .from(Budgets)
         .rightJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-        .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress))
+        .where(eq(Budgets.createdBy, email))
         .orderBy(desc(Expenses.id))
         .limit(5);
 
@@ -70,14 +45,52 @@ function Dashboard() {
     } finally {
       setIsRecentLoading(false);
     }
-  };
+  }, [email]);
 
-  // Show the "View All Expenses" button only if there are expenses and not loading
+  const getBudgetList = useCallback(async () => {
+    if (!email) return;
+    setIsBudgetLoading(true);
+    try {
+      const result = await db
+        .select({
+          ...getTableColumns(Budgets),
+          totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
+          totalItem: sql`count(${Expenses.id})`.mapWith(Number),
+        })
+        .from(Budgets)
+        .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+        .where(eq(Budgets.createdBy, email))
+        .groupBy(Budgets.id)
+        .orderBy(desc(Budgets.id));
+
+      setBudgetList(result);
+      // Also refresh recents after budgets load
+      getRecentExpenses();
+    } finally {
+      setIsBudgetLoading(false);
+    }
+  }, [email, getRecentExpenses]);
+
+  useEffect(() => {
+    if (email) getBudgetList();
+  }, [email, getBudgetList]);
+
   const showViewAllExpenses = !isRecentLoading && recentExpensesList.length > 0;
 
   return (
     <div className="p-8">
-      <CreateIncomeExpense onIncomeAdded={() => setChartRefreshKey((k) => k + 1)}/>
+      <CreateIncomeExpense
+        onIncomeAdded={() => {
+          // Keep your area chart in sync with income adds
+          setChartRefreshKey((k) => k + 1);
+        }}
+        onExpenseAdded={() => {
+          // <<< This is the key bit: refresh parent data after an expense insert
+          getBudgetList();               // updates budgets & triggers recent expenses refresh
+          setChartRefreshKey((k) => k + 1); // keeps IncomeVsExpensesArea in sync (optional but nice)
+        }}
+      />
+
       {/* Summary cards */}
       {showViewAllExpenses && <CardInfo budgetList={budgetList} />}
 
@@ -85,10 +98,7 @@ function Dashboard() {
         {/* Left: Bar chart */}
         <div className="h-full">
           <div className="border-2 shadow-md shadow-indigo-300 rounded-lg p-5 h-full min-h-[420px]">
-            <BarChartDashboard
-              budgetList={budgetList}
-              isLoading={isBudgetLoading}
-            />
+            <BarChartDashboard budgetList={budgetList} isLoading={isBudgetLoading} />
           </div>
         </div>
 
@@ -99,13 +109,13 @@ function Dashboard() {
             <BudgetsDonut
               budgetList={budgetList}
               isLoading={isBudgetLoading}
-              refreshData={() => getBudgetList()}
+              refreshData={getBudgetList}
             />
           </div>
         </div>
       </div>
 
-      <IncomeVsExpensesArea refreshKey={chartRefreshKey}/>
+      <IncomeVsExpensesArea refreshKey={chartRefreshKey} />
 
       {/* Recent Expenses card */}
       <div className="grid mt-5">
@@ -115,7 +125,7 @@ function Dashboard() {
           <ExpenseListTable
             expensesList={recentExpensesList}
             isLoading={isRecentLoading}
-            refreshData={() => getBudgetList()}
+            refreshData={getBudgetList}
           />
 
           {showViewAllExpenses && (

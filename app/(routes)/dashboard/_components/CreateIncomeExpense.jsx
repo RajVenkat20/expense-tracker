@@ -161,7 +161,7 @@ export default function CreateIncomeExpense({ onIncomeAdded, onExpenseAdded }) {
       {/* ---------- Add Income ---------- */}
       <Dialog open={incomeOpen} onOpenChange={handleIncomeOpenChange}>
         <DialogTrigger asChild>
-          <div className="p-7 rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-indigo-300">
+          <div className="p-7 rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-green-300">
             <div>
               <h2 className="text-xl font-bold">Add Income</h2>
               <p className="text-xs text-gray-500 mt-1">Record a new income entry</p>
@@ -259,7 +259,7 @@ export default function CreateIncomeExpense({ onIncomeAdded, onExpenseAdded }) {
       {/* ---------- Add Expense ---------- */}
       <Dialog open={expenseOpen} onOpenChange={handleExpenseOpenChange}>
         <DialogTrigger asChild>
-          <div className="p-7 rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-indigo-300">
+          <div className="p-7 rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-red-300">
             <div>
               <h2 className="text-xl font-bold">Add Expense</h2>
               <p className="text-xs text-gray-500 mt-1">Record a new expense</p>
