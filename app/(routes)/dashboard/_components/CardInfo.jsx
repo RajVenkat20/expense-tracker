@@ -48,7 +48,7 @@ function CardInfo({ budgetList }) {
           <Link href={"/dashboard/budgets"}>
             <div className="p-7 border rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-indigo-300">
               <div>
-                <h2 className="text-sm">Budget Types</h2>
+                <h2 className="text-sm">Expense Categories</h2>
                 <h2 className="mt-1 font-bold text-xl text-indigo-600">
                   #{budgetList.length}
                 </h2>

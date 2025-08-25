@@ -13,7 +13,7 @@ function DashboardHeader({ onMenuClick }) {
   }, []);
 
   return (
-    <div className="p-5 shadow-md items-center border-b border-slate-200 flex justify-between bg-blue-100">
+    <div className="p-5 shadow-md items-center border-b border-slate-200 flex justify-between bg-indigo-50">
       {/* Left: greeting */}
       <div>
         <h2 className="font-bold text-3xl">
