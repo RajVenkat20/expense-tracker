@@ -91,7 +91,11 @@ function SideNav({ collapsed = false, setCollapsed }) {
 
       {/* User */}
       <div className={clsx("mb-4 flex items-center gap-3 px-2", collapsed && "justify-center")}>
-        <UserButton />
+        <UserButton appearance={{
+            elements: {
+              avatarBox: { width: "35px", height: "35px" },
+            },
+          }}/>
         {!collapsed && <span className="text-base text-indigo-600">{user?.firstName}</span>}
       </div>
     </aside>
