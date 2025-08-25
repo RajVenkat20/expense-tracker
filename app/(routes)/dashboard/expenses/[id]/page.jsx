@@ -116,7 +116,7 @@ function ExpenseScreen({ params }) {
     // <=25% (incl. 0 or exceeded) -> Message 4
     let title = "";
     let sub = "";
-    let tone = "good"; 
+    let tone = "good";
 
     if (remainingPct > 75) {
       tone = "good";
@@ -218,36 +218,39 @@ function ExpenseScreen({ params }) {
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 mt-6 gap-5 items-stretch">
-  {/* LEFT COLUMN = one tall cell that stacks both cards */}
-  <div className="flex flex-col gap-5 h-full">
-    {/* Vibe card lives under BudgetItem in the SAME column */}
-    {vibe && (
-      <div
-        className={`relative overflow-hidden rounded-lg p-5 text-white shadow-xl ring-1 bg-gradient-to-r ${vibe.ringShadow}`}
-      >
-        <div className="pointer-events-none absolute inset-0 opacity-20 animate-pulse bg-[radial-gradient(120px_80px_at_20%_10%,white,transparent),radial-gradient(120px_80px_at_80%_90%,white,transparent)]" />
-        <div className="relative">
-          {/* <p className="text-xs uppercase opacity-90">Budget vibe check</p> */}
-          <h3 className="mt-1 text-2xl font-extrabold drop-shadow">{vibe.title}</h3>
-          <p className="mt-2 text-sm opacity-95">{vibe.sub}</p>
+        {/* LEFT COLUMN = one tall cell that stacks both cards */}
+        <div className="flex flex-col gap-5 h-full">
+          {/* Vibe card lives under BudgetItem in the SAME column */}
+          {vibe && (
+            <div
+              className={`relative overflow-hidden rounded-lg p-5 text-white shadow-xl ring-1 bg-gradient-to-r ${vibe.ringShadow}`}
+            >
+              <div className="pointer-events-none absolute inset-0 opacity-20 animate-pulse bg-[radial-gradient(120px_80px_at_20%_10%,white,transparent),radial-gradient(120px_80px_at_80%_90%,white,transparent)]" />
+              <div className="relative">
+                {/* <p className="text-xs uppercase opacity-90">Budget vibe check</p> */}
+                <h3 className="mt-1 text-2xl font-extrabold drop-shadow">
+                  {vibe.title}
+                </h3>
+                <p className="mt-2 text-sm opacity-95">{vibe.sub}</p>
+              </div>
+            </div>
+          )}
+          {budgetInfo ? (
+            <BudgetItem budget={budgetInfo} />
+          ) : (
+            <div className="h-[150px] w-full bg-slate-200 rounded-lg animate-pulse" />
+          )}
+        </div>
+
+        {/* RIGHT COLUMN = single tall cell (force child to fill) */}
+        <div className="h-full [&>*]:h-full">
+          <AddExpense
+            budgetId={budgetId}
+            user={user}
+            refreshData={getBudgetInfo}
+          />
         </div>
       </div>
-    )}
-    {budgetInfo ? (
-      <BudgetItem budget={budgetInfo} />
-    ) : (
-      <div className="h-[150px] w-full bg-slate-200 rounded-lg animate-pulse" />
-    )}
-
-    
-  </div>
-
-  {/* RIGHT COLUMN = single tall cell (force child to fill) */}
-  <div className="h-full [&>*]:h-full">
-    <AddExpense budgetId={budgetId} user={user} refreshData={getBudgetInfo} />
-  </div>
-</div>
-
 
       <div className="mt-4 border p-5 shadow-md rounded-lg shadow-indigo-300">
         <h2 className="font-bold text-lg">Latest Expenses</h2>
