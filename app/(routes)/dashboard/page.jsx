@@ -20,6 +20,7 @@ function Dashboard() {
   const [isBudgetLoading, setIsBudgetLoading] = useState(true);
   const [isRecentLoading, setIsRecentLoading] = useState(true);
   const [recentExpensesList, setRecentExpensesList] = useState([]);
+  const [chartRefreshKey, setChartRefreshKey] = useState(0);
 
   useEffect(() => {
     user && getBudgetList();
@@ -76,7 +77,7 @@ function Dashboard() {
 
   return (
     <div className="p-8">
-      {/* <CreateIncomeExpense/> */}
+      <CreateIncomeExpense onIncomeAdded={() => setChartRefreshKey((k) => k + 1)}/>
       {/* Summary cards */}
       {showViewAllExpenses && <CardInfo budgetList={budgetList} />}
 
@@ -104,7 +105,7 @@ function Dashboard() {
         </div>
       </div>
 
-      <IncomeVsExpensesArea />
+      <IncomeVsExpensesArea refreshKey={chartRefreshKey}/>
 
       {/* Recent Expenses card */}
       <div className="grid mt-5">

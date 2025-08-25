@@ -15,6 +15,13 @@
       "when": 1755635704912,
       "tag": "0001_aromatic_the_initiative",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1756054811553,
+      "tag": "0002_broken_namor",
+      "breakpoints": true
     }
   ]
 }

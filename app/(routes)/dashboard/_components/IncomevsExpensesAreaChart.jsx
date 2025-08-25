@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { Loader2, PieChart as PieChartIcon } from "lucide-react";
+import { PieChart as PieChartIcon } from "lucide-react";
 
 /* ---------- helpers ---------- */
 const rangeToStartISO = (range) => {
@@ -39,16 +39,12 @@ const rangeToStartISO = (range) => {
   if (range === "7d") start.setDate(end.getDate() - 6);
   else if (range === "30d") start.setMonth(end.getMonth() - 1);
   else start.setMonth(end.getMonth() - 3); // "90d"
-  return start.toISOString().slice(0, 10);
+  return start.toISOString().slice(0, 10); // YYYY-MM-DD
 };
 
-// Cast Expenses.createdAt (varchar) to DATE handling "YYYY-MM-DD" and "MM/DD/YYYY"
-const expenseDateExpr = sql`
-  CASE 
-    WHEN ${Expenses.createdAt} ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' THEN TO_DATE(${Expenses.createdAt}, 'YYYY-MM-DD')
-    ELSE TO_DATE(${Expenses.createdAt}, 'MM/DD/YYYY')
-  END
-`;
+// normalize Date | string -> 'YYYY-MM-DD'
+const toKey = (d) =>
+  typeof d === "string" ? d.slice(0, 10) : new Date(d).toISOString().slice(0, 10);
 
 // fill day gaps so the line/area is continuous
 const fillGaps = (startISO, map) => {
@@ -63,8 +59,9 @@ const fillGaps = (startISO, map) => {
 };
 
 export default function IncomeVsExpensesArea({
-  showHeader = true, // hide to avoid duplicate titles
-  stacked = false, // set true if you prefer stacking
+  showHeader = true,
+  stacked = false,
+  refreshKey = 0, // bump to refetch
 }) {
   const { user } = useUser();
   const [timeRange, setTimeRange] = React.useState("7d");
@@ -80,47 +77,36 @@ export default function IncomeVsExpensesArea({
         const email = user?.primaryEmailAddress?.emailAddress ?? "";
         const startISO = rangeToStartISO(timeRange);
 
-        // INCOME per day
+        // INCOME per day (Income.createdAt is DATE)
         const incomeRows = await db
           .select({
-            date: sql`DATE(${Income.createdAt})`.as("date"),
+            date: Income.createdAt, // DATE column
             total: sql`SUM(${Income.amount})`.mapWith(Number).as("total"),
           })
           .from(Income)
-          .where(
-            and(eq(Income.createdBy, email), gte(Income.createdAt, startISO))
-          )
-          .groupBy(sql`DATE(${Income.createdAt})`)
-          .orderBy(sql`DATE(${Income.createdAt})`);
+          .where(and(eq(Income.createdBy, email), gte(Income.createdAt, sql`${startISO}::date`)))
+          .groupBy(Income.createdAt)
+          .orderBy(Income.createdAt);
 
-        // EXPENSES per day
+        // EXPENSES per day (Expenses.createdAt is DATE)
         const expenseRows = await db
           .select({
-            date: expenseDateExpr.as("date"),
+            date: Expenses.createdAt, // DATE column
             total: sql`SUM(${Expenses.amount})`.mapWith(Number).as("total"),
           })
           .from(Expenses)
-          .where(
-            and(
-              eq(Expenses.createdBy, email),
-              sql`${expenseDateExpr} >= ${startISO}`
-            )
-          )
-          .groupBy(expenseDateExpr)
-          .orderBy(expenseDateExpr);
+          .where(and(eq(Expenses.createdBy, email), gte(Expenses.createdAt, sql`${startISO}::date`)))
+          .groupBy(Expenses.createdAt)
+          .orderBy(Expenses.createdAt);
 
-        // merge
+        // merge income & expenses on YYYY-MM-DD
         const map = new Map();
         for (const r of incomeRows) {
-          const key = String(r.date);
-          map.set(key, {
-            date: key,
-            income: Number(r.total) || 0,
-            expenses: 0,
-          });
+          const key = toKey(r.date);
+          map.set(key, { date: key, income: Number(r.total) || 0, expenses: 0 });
         }
         for (const r of expenseRows) {
-          const key = String(r.date);
+          const key = toKey(r.date);
           const prev = map.get(key) || { date: key, income: 0, expenses: 0 };
           prev.expenses = Number(r.total) || 0;
           map.set(key, prev);
@@ -133,17 +119,16 @@ export default function IncomeVsExpensesArea({
     };
 
     run();
-  }, [user, timeRange]);
+  }, [user, timeRange, refreshKey]);
 
   const hasRows = Array.isArray(data) && data.length > 0;
   const hasNonZero =
-    hasRows &&
-    data.some((d) => Number(d.income || 0) > 0 || Number(d.expenses || 0) > 0);
+    hasRows && data.some((d) => Number(d.income || 0) > 0 || Number(d.expenses || 0) > 0);
 
-  // Colors: indigo-300 & indigo-500
+  // Colors (wired to your ChartContainer CSS vars)
   const chartConfig = {
-    income: { label: "Income", color: "#10b981" }, // indigo-300
-    expenses: { label: "Expenses", color: "#f43f5e" }, // indigo-500
+    income: { label: "Income", color: "#10b981" }, // emerald-500
+    expenses: { label: "Expenses", color: "#f43f5e" }, // rose-500
   };
 
   return (
@@ -180,10 +165,7 @@ export default function IncomeVsExpensesArea({
         <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
           {loading ? (
             <div className="h-[300px] flex items-center justify-center gap-2 rounded-md bg-gradient-to-br from-indigo-50 to-white">
-              <svg
-                className="h-5 w-5 animate-spin text-indigo-600"
-                viewBox="0 0 24 24"
-              >
+              <svg className="h-5 w-5 animate-spin text-indigo-600" viewBox="0 0 24 24">
                 <circle
                   className="opacity-25"
                   cx="12"
@@ -203,46 +185,20 @@ export default function IncomeVsExpensesArea({
           ) : !hasNonZero ? (
             <div className="h-[300px] flex flex-col items-center justify-center rounded-md border border-dashed border-indigo-200 bg-indigo-50/30 text-center">
               <PieChartIcon className="h-6 w-6 text-indigo-500 mb-2" />
-              <p className="text-sm font-medium text-gray-700">
-                No income/expense data yet
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Add income or expenses to see your trend.
-              </p>
+              <p className="text-sm font-medium text-gray-700">No income/expense data yet</p>
+              <p className="text-xs text-gray-500 mt-1">Add income or expenses to see your trend.</p>
             </div>
           ) : (
-            <ChartContainer
-              config={chartConfig}
-              className="aspect-auto h-[250px] w-full"
-            >
-              <AreaChart
-                data={data}
-                margin={{ top: 8, right: 16, left: 0, bottom: 8 }}
-              >
+            <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+              <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
                 <defs>
                   <linearGradient id="fillIncome" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="var(--color-income)"
-                      stopOpacity={0.8}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="var(--color-income)"
-                      stopOpacity={0.1}
-                    />
+                    <stop offset="5%" stopColor="var(--color-income)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--color-income)" stopOpacity={0.1} />
                   </linearGradient>
                   <linearGradient id="fillExpenses" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="var(--color-expenses)"
-                      stopOpacity={0.8}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="var(--color-expenses)"
-                      stopOpacity={0.1}
-                    />
+                    <stop offset="5%" stopColor="var(--color-expenses)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--color-expenses)" stopOpacity={0.1} />
                   </linearGradient>
                 </defs>
 
@@ -261,18 +217,13 @@ export default function IncomeVsExpensesArea({
                     })
                   }
                 />
-                {/* This is what fixes the “cut at the bottom” look */}
-                <YAxis
-                  hide
-                  domain={[0, (max) => max * 1.1]}
-                  padding={{ top: 12, bottom: 12 }}
-                />
+                <YAxis hide domain={[0, (max) => max * 1.1]} padding={{ top: 12, bottom: 12 }} />
 
                 <ChartTooltip
                   cursor={false}
                   content={
                     <ChartTooltipContent
-                      className="text-[11px] sm:text-[11px]" // tooltip font size
+                      className="text-[11px] sm:text-[11px]"
                       labelFormatter={(v) =>
                         new Date(v).toLocaleDateString("en-US", {
                           month: "short",
@@ -303,13 +254,7 @@ export default function IncomeVsExpensesArea({
 
                 <ChartLegend
                   content={
-                    <ChartLegendContent
-                      className="mt-3
-        text-[13px] sm:text-[16px]
-        [&_li]:gap-2
-        [&_svg]:h-4 [&_svg]:w-4
-      "
-                    />
+                    <ChartLegendContent className="mt-3 text-[13px] sm:text-[16px] [&_li]:gap-2 [&_svg]:h-4 [&_svg]:w-4" />
                   }
                 />
               </AreaChart>
