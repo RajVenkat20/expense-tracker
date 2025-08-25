@@ -9,6 +9,7 @@ import BudgetItem from "../../budgets/_components/BudgetItem";
 import AddExpense from "../_components/AddExpense";
 import ExpenseListTable from "../_components/ExpenseListTable";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { ArrowLeft, Trash2 } from "lucide-react";
 
 import {
@@ -62,7 +63,8 @@ function ExpenseScreen({ params }) {
       .select()
       .from(Expenses)
       .where(eq(Expenses.budgetId, id))
-      .orderBy(desc(Expenses.id));
+      .orderBy(desc(Expenses.id))
+      .limit(5);;
 
     setExpensesList(result);
   };
@@ -142,12 +144,17 @@ function ExpenseScreen({ params }) {
           refreshData={() => getBudgetInfo()}
         />
       </div>
-      <div className="mt-4">
+      <div className="mt-4 border p-5 shadow-md rounded-lg shadow-indigo-300">
         <h2 className="font-bold text-lg">Latest Expenses</h2>
         <ExpenseListTable
           expensesList={expensesList}
           refreshData={getBudgetInfo}
         />
+        <Link href="/dashboard/expenses">
+              <Button className="mt-4 cursor-pointer transform transition-all ease-out duration-400 w-full bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg hover:scale-[1.02]">
+                View All Expenses
+              </Button>
+            </Link>
       </div>
     </div>
   );
