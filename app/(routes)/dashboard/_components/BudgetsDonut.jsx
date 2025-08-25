@@ -63,16 +63,16 @@ function BudgetsDonut({ budgetList = [], isLoading = false }) {
         <div className="flex h-full w-full flex-col items-center justify-center rounded-md border border-dashed border-indigo-200 bg-indigo-50/30 p-6 text-center">
           <ChartPie className="h-6 w-6 text-indigo-500 mb-2" />
           <p className="text-sm font-medium text-gray-700">
-            No budget breakdown yet
+            No expense categories breakdown yet
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            Create a budget or assign amounts to see your distribution.
+            Create an expense category or assign amounts to see your distribution.
           </p>
           <Link
             href="/dashboard/budgets"
             className="mt-3 inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
           >
-            Create Budget
+            Create Expense Category
           </Link>
         </div>
       </ChartContainer>
@@ -80,6 +80,8 @@ function BudgetsDonut({ budgetList = [], isLoading = false }) {
   }
 
   return (
+    <div>
+      <h2 className="font-bold text-lg mb-4">Expense Categories Breakdown</h2>
     <ChartContainer className="mx-auto aspect-square max-h-[320px]" config={{}}>
       <PieChart>
         <Pie
@@ -113,7 +115,7 @@ function BudgetsDonut({ budgetList = [], isLoading = false }) {
                       y={(viewBox.cy || 0) + 18}
                       className="fill-gray-500 text-xs"
                     >
-                      Total Budget Allocated
+                      Total Allocated
                     </tspan>
                   </text>
                 );
@@ -129,6 +131,7 @@ function BudgetsDonut({ budgetList = [], isLoading = false }) {
         />
       </PieChart>
     </ChartContainer>
+    </div>
   );
 }
 

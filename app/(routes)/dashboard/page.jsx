@@ -105,7 +105,6 @@ function Dashboard() {
         {/* Right: Donut chart */}
         <div className="h-full">
           <div className="border-2 shadow-md shadow-indigo-300 rounded-lg p-5 h-full min-h-[420px]">
-            <h2 className="font-bold text-lg mb-4">Budgets Breakdown</h2>
             <BudgetsDonut
               budgetList={budgetList}
               isLoading={isBudgetLoading}
