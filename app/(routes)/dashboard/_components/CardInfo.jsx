@@ -29,7 +29,9 @@ function CardInfo({ budgetList }) {
         <div className="mt-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="p-7 border rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-indigo-300">
             <div>
-              <h2 className="text-sm">Total Budget</h2>
+              <h2 className="text-sm">
+                Total Budget
+              </h2>
               <h2 className="mt-1 font-bold text-xl text-green-600">
                 +${totalBudget}
               </h2>
@@ -45,17 +47,17 @@ function CardInfo({ budgetList }) {
             </div>
             <ReceiptText className="bg-indigo-600 p-3 h-12 w-12 rounded-full text-white shadow-lg animate-pulse" />
           </div>
-          <Link href={"/dashboard/budgets"}>
-            <div className="p-7 border rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-indigo-300">
+          <div className="p-7 border rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-indigo-300">
+            <Link href={"/dashboard/budgets"}>
               <div>
                 <h2 className="text-sm">Expense Categories</h2>
                 <h2 className="mt-1 font-bold text-xl text-indigo-600">
                   #{budgetList.length}
                 </h2>
               </div>
-              <Boxes className="bg-indigo-600 p-3 h-12 w-12 rounded-full text-white shadow-lg animate-pulse" />
-            </div>
-          </Link>
+            </Link>
+            <Boxes className="bg-indigo-600 p-3 h-12 w-12 rounded-full text-white shadow-lg animate-pulse" />
+          </div>
         </div>
       ) : (
         <div className="mt-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
