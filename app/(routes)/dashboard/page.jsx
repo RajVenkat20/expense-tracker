@@ -34,9 +34,12 @@ function Dashboard() {
           name: Expenses.name,
           amount: Expenses.amount,
           createdAt: Expenses.createdAt,
+          // ↓ include category fields from Budgets for the table
+          category: Budgets.name,
+          categoryId: Budgets.id,
         })
-        .from(Budgets)
-        .rightJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+        .from(Expenses)
+        .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId))
         .where(eq(Budgets.createdBy, email))
         .orderBy(desc(Expenses.id))
         .limit(5);
@@ -64,7 +67,7 @@ function Dashboard() {
         .orderBy(desc(Budgets.id));
 
       setBudgetList(result);
-      // Also refresh recents after budgets load
+      // also refresh recents after budgets load
       getRecentExpenses();
     } finally {
       setIsBudgetLoading(false);
@@ -80,14 +83,10 @@ function Dashboard() {
   return (
     <div className="p-8">
       <CreateIncomeExpense
-        onIncomeAdded={() => {
-          // Keep your area chart in sync with income adds
-          setChartRefreshKey((k) => k + 1);
-        }}
+        onIncomeAdded={() => setChartRefreshKey((k) => k + 1)}
         onExpenseAdded={() => {
-          // <<< This is the key bit: refresh parent data after an expense insert
-          getBudgetList();               // updates budgets & triggers recent expenses refresh
-          setChartRefreshKey((k) => k + 1); // keeps IncomeVsExpensesArea in sync (optional but nice)
+          getBudgetList();               // refresh budgets & recents
+          setChartRefreshKey((k) => k + 1);
         }}
       />
 
@@ -95,14 +94,12 @@ function Dashboard() {
       {showViewAllExpenses && <CardInfo budgetList={budgetList} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 mt-6 gap-5 items-stretch">
-        {/* Left: Bar chart */}
         <div className="h-full">
           <div className="border-2 shadow-md shadow-indigo-300 rounded-lg p-5 h-full min-h-[420px]">
             <BarChartDashboard budgetList={budgetList} isLoading={isBudgetLoading} />
           </div>
         </div>
 
-        {/* Right: Donut chart */}
         <div className="h-full">
           <div className="border-2 shadow-md shadow-indigo-300 rounded-lg p-5 h-full min-h-[420px]">
             <BudgetsDonut
@@ -122,6 +119,7 @@ function Dashboard() {
           <h2 className="font-bold text-lg mb-4">Recent Expenses</h2>
 
           <ExpenseListTable
+            showCategory   // tell the table to render the Category column
             expensesList={recentExpensesList}
             isLoading={isRecentLoading}
             refreshData={getBudgetList}
@@ -129,7 +127,7 @@ function Dashboard() {
 
           {showViewAllExpenses && (
             <Link href="/dashboard/expenses">
-              <Button className="mt-4 cursor-pointer transform transition-all ease-out duration-400 w-full bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg hover:scale-[1.02]">
+              <Button className="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg hover:scale-[1.02]">
                 View All Expenses
               </Button>
             </Link>
