@@ -44,6 +44,10 @@ function ExpensesScreen() {
     dateTo: "",
   });
 
+  // --- INSIGHTS STATE (for the filtered result set) ---
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [topExpense, setTopExpense] = useState(null); // { name, amount } | null
+
   const { user } = useUser();
   const route = useRouter();
 
@@ -69,8 +73,12 @@ function ExpensesScreen() {
     const minVal = criteria.amountMin !== "" ? Number(criteria.amountMin) : null;
     const maxVal = criteria.amountMax !== "" ? Number(criteria.amountMax) : null;
 
-    if (minVal != null && !Number.isNaN(minVal) &&
-        maxVal != null && !Number.isNaN(maxVal)) {
+    if (
+      minVal != null &&
+      !Number.isNaN(minVal) &&
+      maxVal != null &&
+      !Number.isNaN(maxVal)
+    ) {
       conds.push(between(Expenses.amount, minVal, maxVal));
     } else if (minVal != null && !Number.isNaN(minVal)) {
       conds.push(gte(Expenses.amount, minVal));
@@ -79,8 +87,12 @@ function ExpensesScreen() {
     }
 
     // date range filters (works best if createdAt is DATE or ISO string)
-    const from = criteria.dateFrom && criteria.dateFrom.trim() !== "" ? criteria.dateFrom : null;
-    const to = criteria.dateTo && criteria.dateTo.trim() !== "" ? criteria.dateTo : null;
+    const from =
+      criteria.dateFrom && criteria.dateFrom.trim() !== ""
+        ? criteria.dateFrom
+        : null;
+    const to =
+      criteria.dateTo && criteria.dateTo.trim() !== "" ? criteria.dateTo : null;
 
     if (from && to) {
       conds.push(between(Expenses.createdAt, from, to));
@@ -93,7 +105,7 @@ function ExpensesScreen() {
     return and(...conds);
   };
 
-  // Fetch a page of expenses + total count (with filters)
+  // Fetch a page of expenses + total count + insights (with filters)
   const getAllExpenses = async (pageArg = 1, criteria = searchCriteria) => {
     setIsAllLoading(true);
     try {
@@ -123,7 +135,35 @@ function ExpensesScreen() {
         .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId))
         .where(whereExpr);
 
-      const [rows, countRows] = await Promise.all([rowsPromise, countPromise]);
+      // total amount across filtered set
+      const sumPromise = db
+        .select({
+          // cast to numeric for consistent number return
+          sum: sql`coalesce(sum(${Expenses.amount}::numeric), 0)`,
+        })
+        .from(Expenses)
+        .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId))
+        .where(whereExpr);
+
+      // most expensive across filtered set
+      const topPromise = db
+        .select({
+          name: Expenses.name,
+          amount: Expenses.amount,
+        })
+        .from(Expenses)
+        .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId))
+        .where(whereExpr)
+        .orderBy(desc(Expenses.amount))
+        .limit(1);
+
+      const [rows, countRows, sumRows, topRows] = await Promise.all([
+        rowsPromise,
+        countPromise,
+        sumPromise,
+        topPromise,
+      ]);
+
       const total = Number(countRows?.[0]?.count ?? 0);
 
       // Adjust page if out of range (e.g., after deletes/filters)
@@ -135,6 +175,17 @@ function ExpensesScreen() {
       setExpensesList(rows);
       setTotalCount(total);
       setPage(pageArg);
+
+      // insights
+      setTotalAmount(Number(sumRows?.[0]?.sum ?? 0));
+      setTopExpense(
+        topRows?.[0]
+          ? {
+              name: String(topRows[0].name),
+              amount: Number(topRows[0].amount),
+            }
+          : null
+      );
     } finally {
       setIsAllLoading(false);
     }
@@ -145,7 +196,6 @@ function ExpensesScreen() {
     e?.preventDefault();
     const next = { query, amountMin, amountMax, dateFrom, dateTo };
     setSearchCriteria(next);
-    console.log("SEARCH CRITERIA ->", next);
     getAllExpenses(1, next);
   };
 
@@ -157,7 +207,6 @@ function ExpensesScreen() {
     setDateTo("");
     const cleared = { query: "", amountMin: "", amountMax: "", dateFrom: "", dateTo: "" };
     setSearchCriteria(cleared);
-    console.log("SEARCH CRITERIA CLEARED");
     getAllExpenses(1, cleared);
   };
 
@@ -171,7 +220,10 @@ function ExpensesScreen() {
     <div className="p-10">
       <h2 className="font-bold text-3xl text-shadow-md">
         <span className="flex gap-2 items-center">
-          <ArrowLeft onClick={() => route.back()} className="cursor-pointer hover:text-indigo-600 transform transition-all duration-400 hover:scale-[1.20]" />
+          <ArrowLeft
+            onClick={() => route.back()}
+            className="cursor-pointer hover:text-indigo-600 transform transition-all duration-400 hover:scale-[1.20]"
+          />
           All Expenses
         </span>
       </h2>
@@ -292,6 +344,47 @@ function ExpensesScreen() {
           </Button>
         </div>
       </form>
+
+      {/* INSIGHTS (filtered) */}
+      <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="rounded-lg border-2 p-4 shadow-md shadow-indigo-300">
+          <p className="text-md text-gray-500">Matching Results</p>
+          <p className="mt-1 text-2xl font-semibold text-indigo-700">
+            {isAllLoading ? "—" : totalCount}
+          </p>
+          <p className="text-sm text-gray-400">Items</p>
+        </div>
+
+        <div className="rounded-lg border-2 p-4 shadow-md shadow-indigo-300">
+          <p className="text-md text-gray-500">Total Amount (filtered)</p>
+          <p className="mt-1 text-2xl font-semibold text-indigo-700">
+            {isAllLoading ? "—" : `$${totalAmount.toLocaleString()}`}
+          </p>
+          <p className="text-sm text-gray-400">Sum of all matching expenses</p>
+        </div>
+
+        <div className="rounded-lg border-2 p-4 shadow-md shadow-indigo-300">
+          <p className="text-md text-gray-500">Most Expensive (filtered)</p>
+          {isAllLoading ? (
+            <p className="mt-1 text-lg text-gray-400">—</p>
+          ) : topExpense ? (
+            <div className="mt-1">
+              <p className="text-xl font-semibold text-rose-600">
+                ${Number(topExpense.amount).toLocaleString()}
+              </p>
+              <p
+                className="text-sm font-medium text-gray-400 truncate"
+                title={topExpense.name}
+              >
+                {topExpense.name}
+              </p>
+              
+            </div>
+          ) : (
+            <p className="mt-1 text-lg text-gray-400">—</p>
+          )}
+        </div>
+      </div>
 
       <div className="mt-5 border-2 shadow-md shadow-indigo-300 rounded-lg p-5">
         <ExpenseListTable
