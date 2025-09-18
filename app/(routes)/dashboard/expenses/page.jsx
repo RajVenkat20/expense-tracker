@@ -2,16 +2,7 @@
 
 import { db } from "@/utils/dbConfig";
 import { Budgets, Expenses } from "@/utils/schema";
-import {
-  and,
-  between,
-  desc,
-  eq,
-  gte,
-  ilike,
-  lte,
-  sql,
-} from "drizzle-orm";
+import { and, between, desc, eq, gte, ilike, lte, sql } from "drizzle-orm";
 import React, { useEffect, useState } from "react";
 import ExpenseListTable from "./_components/ExpenseListTable";
 import { useUser } from "@clerk/nextjs";
@@ -44,7 +35,7 @@ function ExpensesScreen() {
   const [amountMin, setAmountMin] = useState("");
   const [amountMax, setAmountMax] = useState("");
   const [dateFrom, setDateFrom] = useState(""); // YYYY-MM-DD
-  const [dateTo, setDateTo] = useState("");     // YYYY-MM-DD
+  const [dateTo, setDateTo] = useState(""); // YYYY-MM-DD
   const [categoryId, setCategoryId] = useState(undefined); // undefined = "All categories"
 
   // Persisted criteria to reuse across pagination
@@ -69,7 +60,6 @@ function ExpensesScreen() {
       loadBudgets();
       getAllExpenses(1, searchCriteria);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadBudgets = async () => {
@@ -99,10 +89,17 @@ function ExpensesScreen() {
       }
     }
 
-    const minVal = criteria.amountMin !== "" ? Number(criteria.amountMin) : null;
-    const maxVal = criteria.amountMax !== "" ? Number(criteria.amountMax) : null;
+    const minVal =
+      criteria.amountMin !== "" ? Number(criteria.amountMin) : null;
+    const maxVal =
+      criteria.amountMax !== "" ? Number(criteria.amountMax) : null;
 
-    if (minVal != null && !Number.isNaN(minVal) && maxVal != null && !Number.isNaN(maxVal)) {
+    if (
+      minVal != null &&
+      !Number.isNaN(minVal) &&
+      maxVal != null &&
+      !Number.isNaN(maxVal)
+    ) {
       conds.push(between(Expenses.amount, minVal, maxVal));
     } else if (minVal != null && !Number.isNaN(minVal)) {
       conds.push(gte(Expenses.amount, minVal));
@@ -110,12 +107,16 @@ function ExpensesScreen() {
       conds.push(lte(Expenses.amount, maxVal));
     }
 
-    const from = criteria.dateFrom && criteria.dateFrom.trim() !== "" ? criteria.dateFrom : null;
-    const to   = criteria.dateTo   && criteria.dateTo.trim()   !== "" ? criteria.dateTo   : null;
+    const from =
+      criteria.dateFrom && criteria.dateFrom.trim() !== ""
+        ? criteria.dateFrom
+        : null;
+    const to =
+      criteria.dateTo && criteria.dateTo.trim() !== "" ? criteria.dateTo : null;
 
     if (from && to) conds.push(between(Expenses.createdAt, from, to));
-    else if (from)  conds.push(gte(Expenses.createdAt, from));
-    else if (to)    conds.push(lte(Expenses.createdAt, to));
+    else if (from) conds.push(gte(Expenses.createdAt, from));
+    else if (to) conds.push(lte(Expenses.createdAt, to));
 
     return and(...conds);
   };
@@ -172,14 +173,19 @@ function ExpensesScreen() {
 
       const total = Number(countRows?.[0]?.count ?? 0);
       const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-      if (pageArg > totalPages && total > 0) return getAllExpenses(totalPages, criteria);
+      if (pageArg > totalPages && total > 0)
+        return getAllExpenses(totalPages, criteria);
 
       setExpensesList(rows);
       setTotalCount(total);
       setPage(pageArg);
 
       setTotalAmount(Number(sumRows?.[0]?.sum ?? 0));
-      setTopExpense(topRows?.[0] ? { name: String(topRows[0].name), amount: Number(topRows[0].amount) } : null);
+      setTopExpense(
+        topRows?.[0]
+          ? { name: String(topRows[0].name), amount: Number(topRows[0].amount) }
+          : null
+      );
     } finally {
       setIsAllLoading(false);
     }
@@ -205,8 +211,15 @@ function ExpensesScreen() {
     setAmountMax("");
     setDateFrom("");
     setDateTo("");
-    setCategoryId(undefined);
-    const cleared = { query: "", amountMin: "", amountMax: "", dateFrom: "", dateTo: "", categoryId: "" };
+    setCategoryId("");
+    const cleared = {
+      query: "",
+      amountMin: "",
+      amountMax: "",
+      dateFrom: "",
+      dateTo: "",
+      categoryId: "",
+    };
     setSearchCriteria(cleared);
     getAllExpenses(1, cleared);
   };
@@ -230,11 +243,17 @@ function ExpensesScreen() {
       </h2>
 
       {/* SEARCH AREA */}
-      <form onSubmit={handleSearch} className="mt-5 rounded-lg border-2 p-4 shadow-md shadow-indigo-300">
+      <form
+        onSubmit={handleSearch}
+        className="mt-5 rounded-lg border-2 p-4 shadow-md shadow-indigo-300"
+      >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-7">
           {/* Name */}
           <div className="lg:col-span-2">
-            <label htmlFor="search-query" className="mb-1 block text-md font-bold text-gray-700">
+            <label
+              htmlFor="search-query"
+              className="mb-1 block text-md font-bold text-gray-700"
+            >
               Search by name
             </label>
             <Input
@@ -247,7 +266,7 @@ function ExpensesScreen() {
           </div>
 
           {/* Category */}
-          <div>    
+          <div>
             <label className="mb-1 block text-sm font-bold text-gray-700">
               Expense Category
             </label>
@@ -272,7 +291,10 @@ function ExpensesScreen() {
 
           {/* Amount Min */}
           <div>
-            <label htmlFor="amount-min" className="mb-1 block text-sm font-bold text-gray-700">
+            <label
+              htmlFor="amount-min"
+              className="mb-1 block text-sm font-bold text-gray-700"
+            >
               Amount (min)
             </label>
             <Input
@@ -289,7 +311,10 @@ function ExpensesScreen() {
 
           {/* Amount Max */}
           <div>
-            <label htmlFor="amount-max" className="mb-1 block text-sm font-bold text-gray-700">
+            <label
+              htmlFor="amount-max"
+              className="mb-1 block text-sm font-bold text-gray-700"
+            >
               Amount (max)
             </label>
             <Input
@@ -306,7 +331,10 @@ function ExpensesScreen() {
 
           {/* Date From */}
           <div>
-            <label htmlFor="date-from" className="mb-1 block text-sm font-bold text-gray-700">
+            <label
+              htmlFor="date-from"
+              className="mb-1 block text-sm font-bold text-gray-700"
+            >
               Date From
             </label>
             <Input
@@ -320,7 +348,10 @@ function ExpensesScreen() {
 
           {/* Date To */}
           <div>
-            <label htmlFor="date-to" className="mb-1 block text-sm font-bold text-gray-700">
+            <label
+              htmlFor="date-to"
+              className="mb-1 block text-sm font-bold text-gray-700"
+            >
               Date To
             </label>
             <Input
@@ -352,7 +383,7 @@ function ExpensesScreen() {
         </div>
       </form>
 
-      {/* INSIGHTS */}
+      {/* INSIGHT CARDS */}
       <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-lg border-2 p-4 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out">
           <p className="text-md text-gray-500">Matching Results</p>
@@ -379,7 +410,10 @@ function ExpensesScreen() {
               <p className="text-xl font-semibold text-rose-600">
                 ${Number(topExpense.amount).toLocaleString()}
               </p>
-              <p className="text-sm font-medium text-gray-400 truncate" title={topExpense.name}>
+              <p
+                className="text-sm font-medium text-gray-400 truncate"
+                title={topExpense.name}
+              >
                 {topExpense.name}
               </p>
             </div>
@@ -389,6 +423,7 @@ function ExpensesScreen() {
         </div>
       </div>
 
+      {/* RESULTS TABLE */}
       <div className="mt-5 border-2 shadow-md shadow-indigo-300 rounded-lg p-5">
         <ExpenseListTable
           showCategory
