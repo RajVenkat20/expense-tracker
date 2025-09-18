@@ -26,9 +26,14 @@ function ExpenseListTable({
   emptySubtitle = "Add an expense and it’ll appear here.",
 }) {
   const deleteExpense = async (expense) => {
-    const result = await db.delete(Expenses).where(eq(Expenses.id, expense.id)).returning();
+    const result = await db
+      .delete(Expenses)
+      .where(eq(Expenses.id, expense.id))
+      .returning();
     if (result) {
-      toast.success("Expense Deleted!", { className: "text-green-600 font-semibold" });
+      toast.success("Expense Deleted!", {
+        className: "text-green-600 font-semibold",
+      });
       refreshData?.();
     }
   };
@@ -39,8 +44,9 @@ function ExpenseListTable({
   return (
     <div className="mt-3">
       {showHeader && (
-        <div className="font-bold grid grid-cols-4 bg-slate-200 p-4 rounded-lg text-center">
+        <div className="font-bold grid grid-cols-5 bg-slate-200 p-4 rounded-lg text-center">
           <h2>Name</h2>
+          <h2>Category</h2>
           <h2>Amount</h2>
           <h2>Date</h2>
           <h2>Action</h2>
@@ -67,20 +73,31 @@ function ExpenseListTable({
         expensesList.map((expenses, idx) => {
           const amt = Number(expenses.amount ?? 0);
           const amountClass =
-            amt < 50 ? "text-green-600" : amt <= 150 ? "text-orange-500" : "text-red-600 animate-pulse text-shadow-lg";
+            amt < 50
+              ? "text-green-600"
+              : amt <= 150
+              ? "text-orange-500"
+              : "text-red-600 animate-pulse text-shadow-lg";
 
           return (
             <div
               key={idx}
-              className="mt-4 grid grid-cols-4 bg-slate-50 p-4 rounded-lg hover:bg-slate-100 transform transition-all duration-400 ease-out hover:shadow-md items-center text-center"
+              className="mt-4 grid grid-cols-5 bg-slate-50 p-4 rounded-lg hover:bg-slate-100 transform transition-all duration-400 ease-out hover:shadow-md items-center text-center"
             >
               <h2 className="truncate">{expenses.name}</h2>
 
+              {/* Category */}
+              <h2 className="truncate text-gray-700">{expenses.category ?? "—"}</h2>
+
+              {/* Amount */}
               <h2 className={`font-bold ${amountClass}`}>
                 ${amt.toLocaleString(undefined, { maximumFractionDigits: 2 })}
               </h2>
 
+              {/* Date */}
               <h2>{expenses.createdAt}</h2>
+
+              {/* Action */}
               <h2 className="ml-3">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
