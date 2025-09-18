@@ -171,7 +171,7 @@ function ExpenseScreen({ params }) {
     <div className="p-10">
       <h2 className="text-3xl font-bold text-shadow-md flex justify-between items-center">
         <span className="flex gap-2 items-center">
-          <ArrowLeft onClick={() => route.back()} className="cursor-pointer" />
+          <ArrowLeft onClick={() => route.back()} className="cursor-pointer hover:text-indigo-600 transform transition-all duration-400 hover:scale-[1.20]" />
           <span>
             My Expenses{" "}
             {budgetInfo?.name && (
