@@ -349,7 +349,7 @@ function ExpensesScreen() {
       <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-lg border-2 p-4 shadow-md shadow-indigo-300">
           <p className="text-md text-gray-500">Matching Results</p>
-          <p className="mt-1 text-2xl font-semibold text-indigo-700">
+          <p className="mt-1 text-2xl font-semibold text-emerald-500">
             {isAllLoading ? "—" : totalCount}
           </p>
           <p className="text-sm text-gray-400">Items</p>
