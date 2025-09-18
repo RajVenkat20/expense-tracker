@@ -18,12 +18,24 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+/**
+ * Reusable table for showing expenses.
+ *
+ * Props:
+ * - expensesList: array of rows. If showCategory=true, try to read category from
+ *   row.category OR row.budgetName OR row.budget?.name.
+ * - isLoading: boolean
+ * - refreshData: fn
+ * - emptyTitle, emptySubtitle: strings
+ * - showCategory: boolean (default false) -> toggles Category column
+ */
 function ExpenseListTable({
   expensesList = [],
   isLoading = false,
   refreshData,
   emptyTitle = "No recent expenses",
   emptySubtitle = "Add an expense and it’ll appear here.",
+  showCategory = false,
 }) {
   const deleteExpense = async (expense) => {
     const result = await db
@@ -41,12 +53,17 @@ function ExpenseListTable({
   const hasRows = Array.isArray(expensesList) && expensesList.length > 0;
   const showHeader = !isLoading && hasRows;
 
+  // 4 columns normally; 5 when Category is shown
+  const gridColsClass = showCategory ? "grid-cols-5" : "grid-cols-4";
+
   return (
     <div className="mt-3">
       {showHeader && (
-        <div className="font-bold grid grid-cols-5 bg-slate-200 p-4 rounded-lg text-center">
+        <div
+          className={`font-bold grid ${gridColsClass} bg-slate-200 p-4 rounded-lg text-center`}
+        >
           <h2>Name</h2>
-          <h2>Category</h2>
+          {showCategory && <h2>Category</h2>}
           <h2>Amount</h2>
           <h2>Date</h2>
           <h2>Action</h2>
@@ -56,7 +73,10 @@ function ExpenseListTable({
       {isLoading ? (
         <div className="mt-4 space-y-3">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-10 w-full rounded-lg bg-slate-100 animate-pulse" />
+            <div
+              key={i}
+              className="h-10 w-full rounded-lg bg-slate-100 animate-pulse"
+            />
           ))}
           <div className="mt-2 flex items-center gap-2 text-gray-600">
             <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
@@ -70,8 +90,8 @@ function ExpenseListTable({
           <p className="text-xs text-gray-500 mt-1">{emptySubtitle}</p>
         </div>
       ) : (
-        expensesList.map((expenses, idx) => {
-          const amt = Number(expenses.amount ?? 0);
+        expensesList.map((row, idx) => {
+          const amt = Number(row.amount ?? 0);
           const amountClass =
             amt < 50
               ? "text-green-600"
@@ -79,25 +99,30 @@ function ExpenseListTable({
               ? "text-orange-500"
               : "text-red-600 animate-pulse text-shadow-lg";
 
+          // Try multiple keys so the component works with different queries
+          const categoryText =
+            row.category ??
+            row.budgetName ??
+            (row.budget && row.budget.name) ??
+            "—";
+
           return (
             <div
               key={idx}
-              className="mt-4 grid grid-cols-5 bg-slate-50 p-4 rounded-lg hover:bg-slate-100 transform transition-all duration-400 ease-out hover:shadow-md items-center text-center"
+              className={`mt-4 grid ${gridColsClass} bg-slate-50 p-4 rounded-lg hover:bg-slate-100 transform transition-all duration-400 ease-out hover:shadow-md items-center text-center`}
             >
-              <h2 className="truncate">{expenses.name}</h2>
+              <h2 className="truncate">{row.name}</h2>
 
-              {/* Category */}
-              <h2 className="truncate text-gray-700">{expenses.category ?? "—"}</h2>
+              {showCategory && (
+                <h2 className="truncate text-gray-700">{categoryText}</h2>
+              )}
 
-              {/* Amount */}
               <h2 className={`font-bold ${amountClass}`}>
                 ${amt.toLocaleString(undefined, { maximumFractionDigits: 2 })}
               </h2>
 
-              {/* Date */}
-              <h2>{expenses.createdAt}</h2>
+              <h2>{row.createdAt}</h2>
 
-              {/* Action */}
               <h2 className="ml-3">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
@@ -109,15 +134,15 @@ function ExpenseListTable({
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete this expense?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the expense from
-                        the server.
+                        This action cannot be undone. This will permanently
+                        delete the expense from the server.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
                         className="bg-red-600"
-                        onClick={() => deleteExpense(expenses)}
+                        onClick={() => deleteExpense(row)}
                       >
                         Continue
                       </AlertDialogAction>

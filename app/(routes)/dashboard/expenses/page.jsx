@@ -397,6 +397,7 @@ function ExpensesScreen() {
 
       <div className="mt-5 border-2 shadow-md shadow-indigo-300 rounded-lg p-5">
         <ExpenseListTable
+          showCategory
           refreshData={() => getAllExpenses(page, searchCriteria)}
           expensesList={expensesList}
           isLoading={isAllLoading}
