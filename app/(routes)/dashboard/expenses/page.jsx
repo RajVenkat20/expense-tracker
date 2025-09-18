@@ -247,7 +247,7 @@ function ExpensesScreen() {
           </div>
 
           {/* Category */}
-          <div>
+          <div>    
             <label className="mb-1 block text-sm font-bold text-gray-700">
               Expense Category
             </label>
@@ -256,7 +256,7 @@ function ExpensesScreen() {
                 value={categoryId}
                 onValueChange={(val) => setCategoryId(val)}
               >
-                <SelectTrigger className="text-indigo-600">
+                <SelectTrigger className="w-full text-indigo-600">
                   <SelectValue placeholder="All categories" />
                 </SelectTrigger>
                 <SelectContent>
@@ -267,12 +267,6 @@ function ExpensesScreen() {
                   ))}
                 </SelectContent>
               </Select>
-
-              {categoryId !== undefined && (
-                <Button type="button" variant="ghost" size="icon" onClick={() => setCategoryId(undefined)} aria-label="Clear category">
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
             </div>
           </div>
 
