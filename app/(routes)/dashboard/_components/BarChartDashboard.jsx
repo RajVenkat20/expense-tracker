@@ -51,6 +51,15 @@ function BarChartDashboard({ budgetList = [], isLoading = false }) {
     });
   }, [budgetList]);
 
+  // Current month name (e.g., "November")
+  const monthName = React.useMemo(() => {
+    try {
+      return new Date().toLocaleString(undefined, { month: 'long' });
+    } catch (e) {
+      return new Date().toLocaleString('en-US', { month: 'long' });
+    }
+  }, []);
+
   const hasRows = data.length > 0;
   const hasNonZero = hasRows && data.some((d) => d.allocated > 0 || d.used > 0);
 
@@ -65,7 +74,7 @@ function BarChartDashboard({ budgetList = [], isLoading = false }) {
 
   return (
     <div className="rounded-lg">
-      <h2 className="font-bold text-lg mb-4">Spending Breakdown for Expense Types</h2>
+  <h2 className="font-bold text-lg mb-4">Spending Breakdown for {monthName}</h2>
 
       {isLoading ? (
         <div className="h-[300px] flex items-center justify-center gap-2 rounded-md bg-gradient-to-br from-indigo-50 to-white">

@@ -19,6 +19,7 @@ function Dashboard() {
   const email = user?.primaryEmailAddress?.emailAddress ?? "";
 
   const [budgetList, setBudgetList] = useState([]);
+  const [monthlyBudgetList, setMonthlyBudgetList] = useState([]);
   const [isBudgetLoading, setIsBudgetLoading] = useState(true);
   const [isRecentLoading, setIsRecentLoading] = useState(true);
   const [recentExpensesList, setRecentExpensesList] = useState([]);
@@ -54,11 +55,20 @@ function Dashboard() {
     if (!email) return;
     setIsBudgetLoading(true);
     try {
+      // compute month bounds (ISO strings) for current month
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+
+      // Query budgets and include both all-time and this-month aggregates.
       const result = await db
         .select({
           ...getTableColumns(Budgets),
           totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
           totalItem: sql`count(${Expenses.id})`.mapWith(Number),
+          // Sum only amounts within the current month
+          totalSpendThisMonth: sql`sum(CASE WHEN ${Expenses.createdAt} >= ${monthStart} AND ${Expenses.createdAt} < ${monthEnd} THEN ${Expenses.amount} ELSE 0 END)`.mapWith(Number),
+          totalItemThisMonth: sql`sum(CASE WHEN ${Expenses.createdAt} >= ${monthStart} AND ${Expenses.createdAt} < ${monthEnd} THEN 1 ELSE 0 END)`.mapWith(Number),
         })
         .from(Budgets)
         .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
@@ -67,6 +77,15 @@ function Dashboard() {
         .orderBy(desc(Budgets.id));
 
       setBudgetList(result);
+
+      // Build a separate list where totalSpend/totalItem reflect the current month only.
+      const monthlyList = (result || []).map((b) => ({
+        ...b,
+        // ensure numeric values and fall back to 0
+        totalSpend: Number(b.totalSpendThisMonth || 0),
+        totalItem: Number(b.totalItemThisMonth || 0),
+      }));
+      setMonthlyBudgetList(monthlyList);
       // also refresh recents after budgets load
       getRecentExpenses();
     } finally {
@@ -96,7 +115,7 @@ function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 mt-6 gap-5 items-stretch">
         <div className="h-full">
           <div className="border-2 shadow-md shadow-indigo-300 rounded-lg p-5 h-full min-h-[420px]">
-            <BarChartDashboard budgetList={budgetList} isLoading={isBudgetLoading} />
+            <BarChartDashboard budgetList={monthlyBudgetList && monthlyBudgetList.length ? monthlyBudgetList : budgetList} isLoading={isBudgetLoading} />
           </div>
         </div>
 
