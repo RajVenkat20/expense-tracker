@@ -27,7 +27,7 @@ function CardInfo({ budgetList }) {
     <div>
       {budgetList.length > 0 ? (
         <div className="mt-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="p-7 border rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-indigo-300">
+          <div className="p-7 border rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 hover:border-indigo-100 hover:shadow-indigo-300">
             <div>
               <h2 className="text-sm">
                 Lifetime Earnings
@@ -36,18 +36,18 @@ function CardInfo({ budgetList }) {
                 +${Math.abs(totalBudget).toFixed(2)}
               </h2>
             </div>
-            <PiggyBank className="bg-indigo-600 p-3 h-12 w-12 rounded-full text-white shadow-lg animate-pulse" />
+            <PiggyBank className="bg-indigo-600 p-3 h-12 w-12 rounded-full text-white shadow-lg animate-pulse cursor-pointer transform transition-all duration-400 hover:scale-120 hover:shadow-lg hover:bg-green-600 ease-out" />
           </div>
-          <div className="p-7 border rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-indigo-300">
+          <div className="p-7 border rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300  hover:border-indigo-100 hover:shadow-indigo-300">
             <div>
               <h2 className="text-sm">Lifetime Expenses</h2>
               <h2 className="mt-1 font-bold text-xl text-red-600">
                 -${Math.abs(totalSpent).toFixed(2)}
               </h2>
             </div>
-            <ReceiptText className="bg-indigo-600 p-3 h-12 w-12 rounded-full text-white shadow-lg animate-pulse" />
+            <ReceiptText className="bg-indigo-600 p-3 h-12 w-12 rounded-full text-white shadow-lg animate-pulse cursor-pointer transform transition-all duration-400 hover:scale-120 hover:shadow-lg hover:bg-red-600 ease-out" />
           </div>
-          <div className="p-7 border rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-indigo-300">
+          <div className="p-7 border rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 hover:border-indigo-100 hover:shadow-indigo-300">
             <Link href={"/dashboard/budgets"}>
               <div>
                 <h2 className="text-sm">Expense Categories</h2>
@@ -56,7 +56,7 @@ function CardInfo({ budgetList }) {
                 </h2>
               </div>
             </Link>
-            <Boxes className="bg-indigo-600 p-3 h-12 w-12 rounded-full text-white shadow-lg animate-pulse" />
+            <Boxes className="bg-indigo-600 p-3 h-12 w-12 rounded-full text-white shadow-lg  animate-pulse cursor-pointer transform transition-all duration-400 hover:scale-120 hover:shadow-lg ease-out" />
           </div>
         </div>
       ) : (
