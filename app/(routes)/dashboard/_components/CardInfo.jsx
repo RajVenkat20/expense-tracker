@@ -30,19 +30,19 @@ function CardInfo({ budgetList }) {
           <div className="p-7 border rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-indigo-300">
             <div>
               <h2 className="text-sm">
-                Total Budget
+                Lifetime Earnings
               </h2>
               <h2 className="mt-1 font-bold text-xl text-green-600">
-                +${totalBudget}
+                +${Math.abs(totalBudget).toFixed(2)}
               </h2>
             </div>
             <PiggyBank className="bg-indigo-600 p-3 h-12 w-12 rounded-full text-white shadow-lg animate-pulse" />
           </div>
           <div className="p-7 border rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-indigo-300">
             <div>
-              <h2 className="text-sm">Total Spent</h2>
+              <h2 className="text-sm">Lifetime Expenses</h2>
               <h2 className="mt-1 font-bold text-xl text-red-600">
-                -${totalSpent}
+                -${Math.abs(totalSpent).toFixed(2)}
               </h2>
             </div>
             <ReceiptText className="bg-indigo-600 p-3 h-12 w-12 rounded-full text-white shadow-lg animate-pulse" />

@@ -35,9 +35,9 @@ function BudgetItem({ budget }) {
           <div className='flex items-center justify-between mb-3'>
             <h2 className='text-xs text-slate-400'>${safeSpend} Spent</h2>
             {!isOver ? (
-              <h2 className='text-xs text-slate-400'>${safeAmount - safeSpend} Remaining</h2>
+              <h2 className='text-xs text-slate-400'>${Math.abs(safeAmount - safeSpend).toFixed(2)} Remaining</h2>
             ) : (
-              <h2 className='text-xs text-red-600'>Over by ${Math.abs(safeAmount - safeSpend)}</h2>
+              <h2 className='text-xs text-red-600'>Over by ${Math.abs(safeAmount - safeSpend).toFixed(2)}</h2>
             )}
           </div>
 
