@@ -246,10 +246,10 @@ export default function CreateIncomeExpense({ onIncomeAdded, onExpenseAdded }) {
               </Button>
               <Button
                 type="submit"
-                className="bg-indigo-600 hover:bg-indigo-700 w-full sm:w-auto"
+                className="bg-emerald-600 hover:bg-emerald-700 w-full sm:w-auto"
                 disabled={!incomeForm.name || !incomeForm.amount || !incomeForm.date}
               >
-                Submit
+                Add
               </Button>
             </DialogFooter>
           </form>
@@ -383,7 +383,7 @@ export default function CreateIncomeExpense({ onIncomeAdded, onExpenseAdded }) {
                   !expenseForm.budgetId
                 }
               >
-                Submit
+                Add
               </Button>
             </DialogFooter>
           </form>
