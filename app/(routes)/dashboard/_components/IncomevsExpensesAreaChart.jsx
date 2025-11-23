@@ -72,7 +72,7 @@ export default function IncomeVsExpensesArea({
   refreshKey = 0,
 }) {
   const { user } = useUser();
-  const [timeRange, setTimeRange] = React.useState("7d");
+  const [timeRange, setTimeRange] = React.useState("30d");
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
 
