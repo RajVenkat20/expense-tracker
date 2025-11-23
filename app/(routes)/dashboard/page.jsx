@@ -43,7 +43,7 @@ function Dashboard() {
         .from(Expenses)
         .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId))
         .where(eq(Budgets.createdBy, email))
-        .orderBy(desc(Expenses.id))
+        .orderBy(desc(Expenses.createdAt))
         .limit(5);
 
       setRecentExpensesList(result);

@@ -140,7 +140,7 @@ function ExpensesScreen() {
         .from(Expenses)
         .innerJoin(Budgets, eq(Budgets.id, Expenses.budgetId))
         .where(whereExpr)
-        .orderBy(desc(Expenses.id))
+        .orderBy(desc(Expenses.createdAt))
         .limit(PAGE_SIZE)
         .offset(offset);
 
