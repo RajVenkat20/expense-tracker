@@ -5,7 +5,7 @@ import { useUser } from "@clerk/nextjs";
 import CardInfo from "./_components/CardInfo";
 import { db } from "@/utils/dbConfig";
 import { desc, eq, getTableColumns, sql } from "drizzle-orm";
-import { Budgets, Expenses } from "@/utils/schema";
+import { Budgets, Expenses, Income } from "@/utils/schema";
 import BarChartDashboard from "./_components/BarChartDashboard";
 import ExpenseListTable from "./expenses/_components/ExpenseListTable";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ function Dashboard() {
 
   const [budgetList, setBudgetList] = useState([]);
   const [monthlyBudgetList, setMonthlyBudgetList] = useState([]);
+  const [monthlyEarnings, setMonthlyEarnings] = useState(0);
   const [isBudgetLoading, setIsBudgetLoading] = useState(true);
   const [isRecentLoading, setIsRecentLoading] = useState(true);
   const [recentExpensesList, setRecentExpensesList] = useState([]);
@@ -86,6 +87,20 @@ function Dashboard() {
         totalItem: Number(b.totalItemThisMonth || 0),
       }));
       setMonthlyBudgetList(monthlyList);
+
+      // Also fetch total income (earnings) for the current month
+      try {
+        const incomeRes = await db
+          .select({ total: sql`sum(${Income.amount})`.mapWith(Number) })
+          .from(Income)
+          .where(sql`${Income.createdAt} >= ${monthStart} AND ${Income.createdAt} < ${monthEnd} AND ${Income.createdBy} = ${email}`);
+
+        const totalIncome = (Array.isArray(incomeRes) && incomeRes[0] && Number(incomeRes[0].total)) || 0;
+        setMonthlyEarnings(totalIncome);
+      } catch (e) {
+        // keep monthlyEarnings as 0 on error
+        setMonthlyEarnings(0);
+      }
       // also refresh recents after budgets load
       getRecentExpenses();
     } finally {
@@ -110,7 +125,7 @@ function Dashboard() {
       />
 
       {/* Summary cards */}
-      {showViewAllExpenses && <CardInfo budgetList={budgetList} />}
+  {showViewAllExpenses && <CardInfo budgetList={budgetList} monthlyEarnings={monthlyEarnings} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 mt-6 gap-5 items-stretch">
         <div className="h-full">
