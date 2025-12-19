@@ -385,7 +385,7 @@ function ExpensesScreen() {
 
       {/* INSIGHT CARDS */}
       <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-lg border-2 p-4 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out">
+        <div className="rounded-lg border-2 p-4 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:shadow-lg ease-out">
           <p className="text-md text-gray-500">Matching Results</p>
           <p className="mt-1 text-2xl font-semibold text-emerald-500">
             {isAllLoading ? "—" : totalCount}
@@ -393,7 +393,7 @@ function ExpensesScreen() {
           <p className="text-sm text-gray-400">Items</p>
         </div>
 
-        <div className="rounded-lg border-2 p-4 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out">
+        <div className="rounded-lg border-2 p-4 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:shadow-lg ease-out">
           <p className="text-md text-gray-500">Total Amount (filtered)</p>
           <p className="mt-1 text-2xl font-semibold text-indigo-700">
             {isAllLoading ? "—" : `$${totalAmount.toLocaleString()}`}
@@ -401,7 +401,7 @@ function ExpensesScreen() {
           <p className="text-sm text-gray-400">Sum of all matching expenses</p>
         </div>
 
-        <div className="rounded-lg border-2 p-4 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out">
+        <div className="rounded-lg border-2 p-4 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:shadow-lg ease-out">
           <p className="text-md text-gray-500">Most Expensive (filtered)</p>
           {isAllLoading ? (
             <p className="mt-1 text-lg text-gray-400">—</p>

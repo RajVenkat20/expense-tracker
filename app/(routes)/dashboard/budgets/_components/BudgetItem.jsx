@@ -17,7 +17,7 @@ function BudgetItem({ budget }) {
   return (
     <Link href={'/dashboard/expenses/' + budget.id} >
       <div
-        className={`p-5 border-2 shadow-md rounded-lg hover:shadow-lg transform ease-out hover:scale-102 cursor-pointer hover:border-indigo-100 transition-all duration-400 h-[170px] 
+        className={`p-5 border-2 shadow-md rounded-lg hover:shadow-lg transform ease-out cursor-pointer hover:border-indigo-100 transition-all duration-400 h-[170px] 
         ${isOver ? 'shadow-red-300 hover:shadow-red-400' : 'shadow-indigo-300 hover:shadow-indigo-300'}`}
       >
         <div className='flex gap-2 items-center justify-between'>
