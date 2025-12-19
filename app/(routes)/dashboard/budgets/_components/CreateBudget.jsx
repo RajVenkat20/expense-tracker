@@ -49,7 +49,7 @@ function CreateBudget({ refreshData }) {
     e?.preventDefault();
 
     if (!user?.primaryEmailAddress?.emailAddress) {
-      toast.error("You must be signed in to create a budget.");
+      toast.error("You must be signed in to create a category.");
       return;
     }
 
@@ -58,7 +58,7 @@ function CreateBudget({ refreshData }) {
     const numAmount = parseFloat(String(amount || "").trim());
 
     if (!trimmedName) {
-      toast.error("Please enter a budget name.");
+      toast.error("Please enter a category name.");
       return;
     }
     if (!Number.isFinite(numAmount) || numAmount <= 0) {
@@ -91,7 +91,7 @@ function CreateBudget({ refreshData }) {
       }
     } catch (err) {
       console.error(err);
-      toast.error("Failed to create budget. Please try again.");
+      toast.error("Failed to create category. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -147,7 +147,7 @@ function CreateBudget({ refreshData }) {
 
                 {/* Name */}
                 <div>
-                  <h2 className="text-black font-md mb-1">Budget Type Name</h2>
+                  <h2 className="text-black font-md mb-1">Category Name</h2>
                   <Input
                     placeholder="e.g. Home Decor"
                     value={name}
@@ -184,7 +184,7 @@ function CreateBudget({ refreshData }) {
                         Creating…
                       </span>
                     ) : (
-                      "Create Budget Type"
+                      "Create Category"
                     )}
                   </Button>
                 </DialogFooter>
