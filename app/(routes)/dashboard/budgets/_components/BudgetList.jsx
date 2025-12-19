@@ -89,9 +89,9 @@ function BudgetList() {
       ) : (
         <div className="flex items-center justify-center rounded-lg border border-dashed border-indigo-200 bg-indigo-50/30 p-6 text-center">
           <div>
-            <p className="text-sm font-medium text-gray-700">No budgets yet</p>
+            <p className="text-sm font-medium text-gray-700">No expense categories yet</p>
             <p className="mt-1 text-xs text-gray-500">
-              Create your first budget to get started.
+              Create your first expense category to get started.
             </p>
           </div>
         </div>
