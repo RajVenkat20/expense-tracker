@@ -22,19 +22,63 @@ function BudgetList() {
   const getBudgetList = async () => {
     setIsLoading(true);
     try {
-      const result = await db
+      // Get current date
+      const now = new Date();
+      // Helper to get period bounds
+      const getPeriodBounds = (type) => {
+        if (type === "Weekly") {
+          // Start of week (Monday)
+          const start = new Date(now);
+          const day = now.getDay() === 0 ? 6 : now.getDay() - 1; // 0=Sunday, so shift to 6, else -1
+          start.setDate(now.getDate() - day);
+          start.setHours(0,0,0,0);
+          const end = new Date(start);
+          end.setDate(start.getDate() + 7);
+          return [start.toISOString(), end.toISOString()];
+        } else if (type === "Monthly") {
+          const start = new Date(now.getFullYear(), now.getMonth(), 1);
+          const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+          return [start.toISOString(), end.toISOString()];
+        } else if (type === "Yearly") {
+          const start = new Date(now.getFullYear(), 0, 1);
+          const end = new Date(now.getFullYear() + 1, 0, 1);
+          return [start.toISOString(), end.toISOString()];
+        }
+        // Default: monthly
+        const start = new Date(now.getFullYear(), now.getMonth(), 1);
+        const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        return [start.toISOString(), end.toISOString()];
+      };
+
+      // Get all budgets first
+      const budgets = await db
         .select({
           ...getTableColumns(Budgets),
-          totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
-          totalItem: sql`count(${Expenses.id})`.mapWith(Number),
         })
         .from(Budgets)
-        .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
         .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress))
-        .groupBy(Budgets.id)
         .orderBy(desc(Budgets.id));
 
-      setBudgetList(result);
+      // For each budget, get period-specific spend and item count
+      const results = await Promise.all(
+        budgets.map(async (budget) => {
+          const type = (budget.type || "Monthly").trim();
+          const [periodStart, periodEnd] = getPeriodBounds(type);
+          const expenseAgg = await db
+            .select({
+              totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
+              totalItem: sql`count(${Expenses.id})`.mapWith(Number),
+            })
+            .from(Expenses)
+            .where(sql`${Expenses.budgetId} = ${budget.id} AND ${Expenses.createdAt} >= ${periodStart} AND ${Expenses.createdAt} < ${periodEnd}`);
+          return {
+            ...budget,
+            totalSpend: expenseAgg[0]?.totalSpend || 0,
+            totalItem: expenseAgg[0]?.totalItem || 0,
+          };
+        })
+      );
+      setBudgetList(results);
     } finally {
       setIsLoading(false);
     }
