@@ -52,9 +52,9 @@ function BudgetList() {
 
   const typeOrder = ["Weekly", "Monthly", "Yearly"];
   const typeLabels = {
-    Weekly: "Weekly Categories",
-    Monthly: "Monthly Categories",
-    Yearly: "Yearly Categories",
+    Weekly: "Weekly Limits",
+    Monthly: "Monthly Limits",
+    Yearly: "Yearly Limits",
   };
 
   return (
