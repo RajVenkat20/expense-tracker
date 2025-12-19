@@ -189,17 +189,17 @@ function ExpenseScreen({ params }) {
                 variant="destructive"
                 className="flex gap-2 transform transition-all ease-out duration-400 hover:scale-103 hover:shadow-lg"
               >
-                <Trash2 /> Delete Expense Category
+                <Trash2 /> Delete Category
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>
-                  Are you sure you want to delete this budget type?
+                  Are you sure you want to delete this category?
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   This action cannot be undone. This will permanently delete the
-                  budget type, all the expenses associated with it, and remove
+                  category, all the expenses associated with it, and remove
                   your data from the server.
                 </AlertDialogDescription>
               </AlertDialogHeader>
@@ -209,7 +209,7 @@ function ExpenseScreen({ params }) {
                   onClick={deleteBudgetType}
                   className="bg-red-600 hover:bg-red-700"
                 >
-                  Continue
+                  Delete
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

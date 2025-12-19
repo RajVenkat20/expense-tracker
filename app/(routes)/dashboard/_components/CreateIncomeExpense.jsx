@@ -164,7 +164,7 @@ export default function CreateIncomeExpense({ onIncomeAdded, onExpenseAdded }) {
           <div className="p-7 rounded-lg flex items-center justify-between border-2 shadow-md shadow-indigo-300 transform transition-all duration-400 hover:scale-104 hover:shadow-lg ease-out cursor-pointer hover:border-indigo-100 hover:shadow-green-300">
             <div>
               <h2 className="text-xl font-bold">Add Income</h2>
-              <p className="text-xs text-gray-500 mt-1">Record a new income entry</p>
+              <p className="text-xs text-gray-500 mt-1">Record a new income</p>
             </div>
             <TrendingUp className="bg-emerald-600 p-3 h-12 w-12 rounded-full text-white shadow-lg" />
           </div>

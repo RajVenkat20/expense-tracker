@@ -60,7 +60,7 @@ function EditBudget({budgetInfo, refreshData}) {
         <DialogTrigger asChild>
           <Button className="flex gap-2 bg-indigo-600 hover:bg-indigo-700 transform transition-all ease-out duration-400 hover:scale-103 hover:shadow-lg">
             <PenBox />
-            Edit Expense Category
+            Edit Category
           </Button>
         </DialogTrigger>
         <DialogContent>
