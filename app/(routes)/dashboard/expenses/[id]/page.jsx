@@ -173,10 +173,10 @@ function ExpenseScreen({ params }) {
         <span className="flex gap-2 items-center">
           <ArrowLeft onClick={() => route.back()} className="cursor-pointer hover:text-indigo-600 transform transition-all duration-400 hover:scale-[1.20]" />
           <span>
-            My Expenses{" "}
+            My Expenses for{" "}
             {budgetInfo?.name && (
               <>
-                for <span className="text-indigo-600">{budgetInfo.name}</span>
+                <span className="text-indigo-600">{budgetInfo.name}</span>
               </>
             )}
           </span>
