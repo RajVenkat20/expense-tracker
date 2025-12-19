@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 function CreateBudget({ refreshData }) {
+  const categoryTypes = ["Weekly", "Monthly", "Yearly"];
   const { user } = useUser();
 
   const [open, setOpen] = useState(false);                // controlled dialog
@@ -29,12 +30,14 @@ function CreateBudget({ refreshData }) {
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
+  const [type, setType] = useState(categoryTypes[1]); // Default to Monthly
 
   const resetForm = () => {
     setEmojiIcon("😀");
     setOpenEmojiPicker(false);
     setName("");
     setAmount("");
+    setType(categoryTypes[1]);
   };
 
   const handleOpenChange = (nextOpen) => {
@@ -77,6 +80,7 @@ function CreateBudget({ refreshData }) {
           amount: String(numAmount),
           createdBy: user.primaryEmailAddress.emailAddress,
           icon: emojiIcon,
+          type,
         })
         .returning({ insertedId: Budgets.id });
 
@@ -170,6 +174,21 @@ function CreateBudget({ refreshData }) {
                     onChange={(e) => setAmount(e.target.value)}
                     disabled={isSaving}
                   />
+                </div>
+
+                {/* Category Type */}
+                <div>
+                  <h2 className="text-black font-md mb-1">Category Type</h2>
+                  <select
+                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                    value={type}
+                    onChange={(e) => setType(e.target.value)}
+                    disabled={isSaving}
+                  >
+                    {categoryTypes.map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <DialogFooter className="sm:justify-start pt-2">
