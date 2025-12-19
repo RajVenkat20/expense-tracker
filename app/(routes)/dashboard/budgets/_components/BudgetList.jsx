@@ -40,34 +40,62 @@ function BudgetList() {
     }
   };
 
+  // Group budgets by type
+  const grouped = React.useMemo(() => {
+    const groups = { Weekly: [], Monthly: [], Yearly: [] };
+    (budgetList || []).forEach((b) => {
+      const type = (b.type || "Monthly").trim();
+      if (groups[type]) groups[type].push(b);
+    });
+    return groups;
+  }, [budgetList]);
+
+  const typeOrder = ["Weekly", "Monthly", "Yearly"];
+  const typeLabels = {
+    Weekly: "Weekly Categories",
+    Monthly: "Monthly Categories",
+    Yearly: "Yearly Categories",
+  };
+
   return (
     <div className="mt-7">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {/* CreateBudget full width */}
+      <div className="mb-8">
         <CreateBudget refreshData={() => getBudgetList()} />
+      </div>
 
-        {isLoading ? (
-          // Skeletons ONLY while loading
-          [1, 2, 3, 4, 5].map((item, idx) => (
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[1, 2, 3, 4, 5].map((item, idx) => (
             <div
               key={idx}
               className="w-full bg-slate-200 rounded-lg h-[145px] animate-pulse"
             />
-          ))
-        ) : budgetList.length > 0 ? (
-          // Actual budget cards
-          budgetList.map((budget, idx) => <BudgetItem key={idx} budget={budget} />)
-        ) : (
-          // Empty state when there are NO budgets (no skeletons)
-          <div className="flex items-center justify-center rounded-lg border border-dashed border-indigo-200 bg-indigo-50/30 p-6 text-center md:col-span-1 lg:col-span-2">
-            <div>
-              <p className="text-sm font-medium text-gray-700">No budgets yet</p>
-              <p className="mt-1 text-xs text-gray-500">
-                Create your first budget to get started.
-              </p>
+          ))}
+        </div>
+      ) : budgetList.length > 0 ? (
+        typeOrder.map((type) =>
+          grouped[type] && grouped[type].length > 0 ? (
+            <div key={type} className="mb-8">
+              <h2 className="font-bold text-lg mb-4 text-indigo-700">{typeLabels[type]}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {grouped[type].map((budget, idx) => (
+                  <BudgetItem key={budget.id || idx} budget={budget} />
+                ))}
+              </div>
             </div>
+          ) : null
+        )
+      ) : (
+        <div className="flex items-center justify-center rounded-lg border border-dashed border-indigo-200 bg-indigo-50/30 p-6 text-center">
+          <div>
+            <p className="text-sm font-medium text-gray-700">No budgets yet</p>
+            <p className="mt-1 text-xs text-gray-500">
+              Create your first budget to get started.
+            </p>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
