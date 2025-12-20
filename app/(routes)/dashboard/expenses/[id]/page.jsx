@@ -1,5 +1,6 @@
 "use client";
 
+import ExpenseAreaChart from "../_components/ExpenseAreaChart";
 import { db } from "@/utils/dbConfig";
 import { Budgets, Expenses } from "@/utils/schema";
 import { useUser } from "@clerk/nextjs";
@@ -36,6 +37,30 @@ function ExpenseScreen({ params }) {
   // get the id from params (passed in by parent/page)
   const id = params?.id;
   const budgetId = Number(id);
+
+  const [chartRange, setChartRange] = useState(1); // months
+  const [chartExpenses, setChartExpenses] = useState([]);
+  // Fetch all expenses for chart (not just 5)
+  const getChartExpenses = async (months = 1) => {
+    if (!budgetId) return;
+    const now = new Date();
+    let fromDate;
+    if (months === 1) {
+      fromDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    } else {
+      fromDate = new Date(now.getFullYear(), now.getMonth() - (months - 1), 1);
+    }
+    const result = await db
+      .select()
+      .from(Expenses)
+      .where(sql`${Expenses.budgetId} = ${budgetId} AND ${Expenses.createdAt} >= ${fromDate.toISOString()}`)
+      .orderBy(desc(Expenses.createdAt));
+    setChartExpenses(result);
+  };
+  useEffect(() => {
+    getChartExpenses(chartRange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [budgetId, chartRange]);
 
   useEffect(() => {
     if (user && id) getBudgetInfo();
@@ -250,6 +275,16 @@ function ExpenseScreen({ params }) {
             refreshData={getBudgetInfo}
           />
         </div>
+      </div>
+
+      {/* Area Chart for spend history */}
+      <div className="mt-8 border p-5 shadow-md rounded-lg shadow-indigo-300">
+        <h2 className="font-bold text-lg mb-2">Spending History</h2>
+        <ExpenseAreaChart
+          expenses={chartExpenses}
+          rangeMonths={chartRange}
+          onRangeChange={setChartRange}
+        />
       </div>
 
       <div className="mt-4 border p-5 shadow-md rounded-lg shadow-indigo-300">
