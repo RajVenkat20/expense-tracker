@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import BudgetsDonut from "./_components/BudgetsDonut";
 import IncomeVsExpensesArea from "./_components/IncomevsExpensesAreaChart";
+import IncomeExpensesBarChart from "./_components/IncomeExpensesBarChart";
 import CreateIncomeExpense from "./_components/CreateIncomeExpense";
 import { calculateAndInsertNetworth } from "@/lib/networth";
 
@@ -167,7 +168,11 @@ function Dashboard() {
         </div>
       </div>
 
-      <IncomeVsExpensesArea refreshKey={chartRefreshKey} />
+
+      {/* <IncomeVsExpensesArea refreshKey={chartRefreshKey} /> */}
+
+      {/* Income vs Expenses Bar Chart */}
+      <IncomeExpensesBarChart userId={email} />
 
       {/* Networth Area Chart */}
       <NetworthAreaChart userId={email} />
