@@ -26,3 +26,13 @@ export const Income=pgTable('income', {
     createdAt: date("createdAt").notNull().defaultNow(),
     createdBy: varchar('createdBy').notNull()
 })
+
+export const Networth = pgTable('networth', {
+  id: serial('id').primaryKey(),
+  userId: varchar('userId').notNull(),         
+  month: integer('month').notNull(),           
+  year: integer('year').notNull(),             
+  amount: numeric('amount').notNull(),     
+  createdAt: date('createdAt').notNull().defaultNow(), 
+  updatedAt: date('updatedAt').notNull().defaultNow(), 
+});

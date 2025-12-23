@@ -13,6 +13,7 @@ import Link from "next/link";
 import BudgetsDonut from "./_components/BudgetsDonut";
 import IncomeVsExpensesArea from "./_components/IncomevsExpensesAreaChart";
 import CreateIncomeExpense from "./_components/CreateIncomeExpense";
+import { calculateAndInsertNetworth } from "@/lib/networth";
 
 function Dashboard() {
   const { user } = useUser();
@@ -111,6 +112,26 @@ function Dashboard() {
   useEffect(() => {
     if (email) getBudgetList();
   }, [email, getBudgetList]);
+
+  // Trigger networth calculation at end of every month
+  useEffect(() => {
+    if (!email) return;
+
+    // Helper to check if today is the last day of the month
+    function isEndOfMonth() {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(now.getDate() + 1);
+      return tomorrow.getDate() === 1;
+    }
+
+    if (isEndOfMonth()) {
+      const now = new Date();
+      const month = now.getMonth() + 1; // JS months are 0-based
+      const year = now.getFullYear();
+      calculateAndInsertNetworth(month, year, email);
+    }
+  }, [email]);
 
   const showViewAllExpenses = !isRecentLoading && recentExpensesList.length > 0;
 
