@@ -58,13 +58,6 @@ export default function NetworthAreaChart({ userId }) {
         )
         .orderBy(Networth.year, Networth.month);
 
-      // Debug logging
-      console.log("NetworthAreaChart debug:", {
-        userId,
-        months,
-        results,
-      });
-
       // Map to chart data
       const chartData = months.map(({ month, year }) => {
         const rec = results.find((r) => r.month === month && r.year === year);
