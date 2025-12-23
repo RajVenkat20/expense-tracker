@@ -1,0 +1,97 @@
+import React, { useEffect, useState } from "react";
+import { db } from "@/utils/dbConfig";
+import { Networth } from "@/utils/schema";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LinearGradient, Stop } from "recharts";
+import { Button } from "@/components/ui/button";
+
+const RANGE_OPTIONS = [
+  { label: "3M", value: 3 },
+  { label: "6M", value: 6 },
+  { label: "1Y", value: 12 },
+];
+
+function formatMonthYear(month, year) {
+  const date = new Date(year, month - 1);
+  return date.toLocaleString("default", { month: "short", year: "2-digit" });
+}
+
+export default function NetworthAreaChart({ userId }) {
+  const [range, setRange] = useState(6);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!userId) return;
+    setLoading(true);
+    (async () => {
+      // Get the latest N months of networth for the user
+      const now = new Date();
+      const months = [];
+      for (let i = range - 1; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push({ month: d.getMonth() + 1, year: d.getFullYear() });
+      }
+      // Query all networth records for these months
+      const results = await db
+        .select()
+        .from(Networth)
+        .where(
+          db.and(
+            db.eq(Networth.userId, userId),
+            db.or(
+              ...months.map(({ month, year }) =>
+                db.and(db.eq(Networth.month, month), db.eq(Networth.year, year))
+              )
+            )
+          )
+        )
+        .orderBy(Networth.year, Networth.month);
+      // Map to chart data
+      const chartData = months.map(({ month, year }) => {
+        const rec = results.find(r => r.month === month && r.year === year);
+        return {
+          name: formatMonthYear(month, year),
+          networth: rec ? Number(rec.amount) : 0,
+        };
+      });
+      setData(chartData);
+      setLoading(false);
+    })();
+  }, [userId, range]);
+
+  return (
+    <div className="w-full bg-white rounded-xl shadow-md p-6 mb-6 mt-5 shadow-indigo-300" >
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-bold text-lg">Networth Over Time</h3>
+        <div className="flex gap-2">
+          {RANGE_OPTIONS.map(opt => (
+            <Button
+              key={opt.value}
+              variant={range === opt.value ? "default" : "outline"}
+              onClick={() => setRange(opt.value)}
+              size="sm"
+            >
+              {opt.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+      <ResponsiveContainer width="100%" height={300}>
+        <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <defs>
+            <linearGradient id="colorNetworth" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8}/>
+              <stop offset="95%" stopColor="#6366f1" stopOpacity={0.1}/>
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip formatter={v => v.toLocaleString()} />
+          <Area type="monotone" dataKey="networth" stroke="#6366f1" fillOpacity={1} fill="url(#colorNetworth)" />
+        </AreaChart>
+      </ResponsiveContainer>
+      {loading && <div className="text-center text-gray-500 mt-2">Loading...</div>}
+    </div>
+  );
+}

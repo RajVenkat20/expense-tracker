@@ -7,6 +7,7 @@ import { db } from "@/utils/dbConfig";
 import { desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { Budgets, Expenses, Income } from "@/utils/schema";
 import BarChartDashboard from "./_components/BarChartDashboard";
+import NetworthAreaChart from "./_components/NetworthAreaChart";
 import ExpenseListTable from "./expenses/_components/ExpenseListTable";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -146,7 +147,7 @@ function Dashboard() {
       />
 
       {/* Summary cards */}
-  {showViewAllExpenses && <CardInfo budgetList={budgetList} monthlyEarnings={monthlyEarnings} />}
+      {showViewAllExpenses && <CardInfo budgetList={budgetList} monthlyEarnings={monthlyEarnings} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 mt-6 gap-5 items-stretch">
         <div className="h-full">
@@ -167,6 +168,9 @@ function Dashboard() {
       </div>
 
       <IncomeVsExpensesArea refreshKey={chartRefreshKey} />
+
+      {/* Networth Area Chart */}
+      <NetworthAreaChart userId={email} />
 
       {/* Recent Expenses card */}
       <div className="grid mt-5">
