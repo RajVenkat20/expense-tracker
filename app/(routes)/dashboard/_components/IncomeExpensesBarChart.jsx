@@ -25,6 +25,9 @@ function formatMonthYear(month, year) {
   return date.toLocaleString("default", { month: "short", year: "2-digit" });
 }
 
+const currencyFormatter = (value) =>
+  `$${Number(value).toLocaleString()}`;
+
 export default function IncomeExpensesBarChart({ userId }) {
   const [range, setRange] = useState(6);
   const [data, setData] = useState([]);
@@ -33,14 +36,16 @@ export default function IncomeExpensesBarChart({ userId }) {
   useEffect(() => {
     if (!userId) return;
     setLoading(true);
+
     (async () => {
       const now = new Date();
       const months = [];
+
       for (let i = range - 1; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         months.push({ month: d.getMonth() + 1, year: d.getFullYear() });
       }
-      // Query all income and expenses for these months, filtered by createdBy
+
       const incomeResults = await db
         .select()
         .from(Income)
@@ -50,8 +55,7 @@ export default function IncomeExpensesBarChart({ userId }) {
         .select()
         .from(Expenses)
         .where(eq(Expenses.createdBy, userId));
-        
-      // Aggregate by month/year
+
       const chartData = months.map(({ month, year }) => {
         const income = incomeResults
           .filter(
@@ -60,6 +64,7 @@ export default function IncomeExpensesBarChart({ userId }) {
               new Date(r.createdAt).getFullYear() === year
           )
           .reduce((sum, r) => sum + Number(r.amount), 0);
+
         const expenses = expenseResults
           .filter(
             (r) =>
@@ -67,57 +72,137 @@ export default function IncomeExpensesBarChart({ userId }) {
               new Date(r.createdAt).getFullYear() === year
           )
           .reduce((sum, r) => sum + Number(r.amount), 0);
+
         return {
           name: formatMonthYear(month, year),
           income,
           expenses,
         };
       });
+
       setData(chartData);
       setLoading(false);
     })();
   }, [userId, range]);
 
   const hasData = data.some((d) => d.income !== 0 || d.expenses !== 0);
+
   return (
-    <div className="w-full bg-white rounded-xl shadow-md p-6 mb-6 mt-5 shadow-indigo-300">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-lg">Income vs Expenses (Bar Chart)</h3>
-        <div className="flex gap-2">
+    <div className="w-full rounded-2xl bg-white p-6 mb-6 mt-5 shadow-lg shadow-indigo-200">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h3 className="font-bold text-lg text-gray-800">
+            Income vs Expenses
+          </h3>
+          <p className="text-sm text-gray-400">
+            Monthly comparison overview
+          </p>
+        </div>
+
+        <div className="flex gap-1 bg-indigo-50 p-1 rounded-lg">
           {RANGE_OPTIONS.map((opt) => (
             <Button
               key={opt.value}
-              variant={range === opt.value ? "default" : "outline"}
-              onClick={() => setRange(opt.value)}
               size="sm"
+              className={`transition-all duration-200 ${
+                range === opt.value
+                  ? "bg-indigo-600 text-white shadow"
+                  : "bg-transparent text-indigo-600 hover:bg-indigo-100"
+              }`}
+              onClick={() => setRange(opt.value)}
             >
               {opt.label}
             </Button>
           ))}
         </div>
       </div>
+
+      {/* Chart */}
       {hasData ? (
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip formatter={(v) => v.toLocaleString()} />
-            <Legend />
-            <Bar dataKey="income" fill="#10b981" name="Income" />
-            <Bar dataKey="expenses" fill="#f43f5e" name="Expenses" />
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="rounded-xl bg-gradient-to-br from-indigo-50 to-white p-4">
+          <ResponsiveContainer width="100%" height={320}>
+            <BarChart
+              data={data}
+              margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+              barGap={6}
+            >
+              <defs>
+                <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#34d399" />
+                  <stop offset="100%" stopColor="#10b981" />
+                </linearGradient>
+                <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#fb7185" />
+                  <stop offset="100%" stopColor="#f43f5e" />
+                </linearGradient>
+              </defs>
+
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis
+                dataKey="name"
+                tick={{ fill: "#6b7280", fontSize: 12 }}
+              />
+              <YAxis
+                tick={{ fill: "#6b7280", fontSize: 12 }}
+                tickFormatter={currencyFormatter}
+              />
+              <Tooltip
+                formatter={(value) => currencyFormatter(value)}
+                contentStyle={{
+                  backgroundColor: "#ffffff",
+                  borderRadius: "8px",
+                  border: "1px solid #e5e7eb",
+                }}
+              />
+              <Legend />
+
+              <Bar
+                dataKey="income"
+                name="Income"
+                fill="url(#incomeGradient)"
+                radius={[6, 6, 0, 0]}
+              />
+              <Bar
+                dataKey="expenses"
+                name="Expenses"
+                fill="url(#expenseGradient)"
+                radius={[6, 6, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       ) : !loading ? (
-        <div className="flex flex-col items-center justify-center h-[300px] bg-[#f7f9fb] rounded-lg border border-dashed border-indigo-100">
-          <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="#6366f1" strokeWidth="1.5" className="mb-2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l2.5 2.5m7.5-2.5a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <div className="flex flex-col items-center justify-center h-[320px] rounded-xl bg-indigo-50 border border-dashed border-indigo-200">
+          <svg
+            width="48"
+            height="48"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="#6366f1"
+            strokeWidth="1.5"
+            className="mb-3"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 8v4l2.5 2.5m7.5-2.5a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
-          <div className="font-semibold text-gray-700 text-lg mb-1">No data yet</div>
-          <div className="text-gray-400">Add income or expenses to see your trend.</div>
+          <div className="font-semibold text-gray-700 text-lg">
+            No data yet
+          </div>
+          <div className="text-gray-400 text-sm mt-1">
+            Add income or expenses to see insights.
+          </div>
         </div>
       ) : null}
-      {loading && <div className="text-center text-gray-500 mt-2">Loading...</div>}
+
+      {loading && (
+        <div className="text-center text-gray-500 mt-3 animate-pulse">
+          Loading chart data…
+        </div>
+      )}
     </div>
   );
 }
