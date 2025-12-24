@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { db } from "@/utils/dbConfig";
 import { Income, Expenses } from "@/utils/schema";
+import { eq } from "drizzle-orm";
 import {
   BarChart,
   Bar,
@@ -39,23 +40,17 @@ export default function IncomeExpensesBarChart({ userId }) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         months.push({ month: d.getMonth() + 1, year: d.getFullYear() });
       }
-      // Query all income and expenses for these months
+      // Query all income and expenses for these months, filtered by createdBy
       const incomeResults = await db
         .select()
         .from(Income)
-        .where(
-          Income.userId
-            ? Income.userId === userId
-            : Income.createdBy === userId
-        );
+        .where(eq(Income.createdBy, userId));
+
       const expenseResults = await db
         .select()
         .from(Expenses)
-        .where(
-          Expenses.userId
-            ? Expenses.userId === userId
-            : Expenses.createdBy === userId
-        );
+        .where(eq(Expenses.createdBy, userId));
+        
       // Aggregate by month/year
       const chartData = months.map(({ month, year }) => {
         const income = incomeResults
