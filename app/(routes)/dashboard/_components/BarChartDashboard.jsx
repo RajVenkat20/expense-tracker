@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -13,7 +13,21 @@ import {
 import { Loader2, PieChart as PieChartIcon } from "lucide-react";
 
 function BarChartDashboard({ budgetList = [], isLoading = false }) {
-  // --- formatters ---
+  /* -------------------------------------------------------------------------- */
+  /*  Responsive helpers                                                         */
+  /* -------------------------------------------------------------------------- */
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  /* -------------------------------------------------------------------------- */
+  /*  Formatters                                                                  */
+  /* -------------------------------------------------------------------------- */
   const fmtMoney = (n, digits = 2) =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -30,54 +44,54 @@ function BarChartDashboard({ budgetList = [], isLoading = false }) {
       maximumFractionDigits: 1,
     }).format(Number(n || 0));
 
-  // Build chart rows: usedWithin + remaining (and optional overspend)
+  /* -------------------------------------------------------------------------- */
+  /*  Data preparation                                                           */
+  /* -------------------------------------------------------------------------- */
   const data = useMemo(() => {
     return (Array.isArray(budgetList) ? budgetList : []).map((b) => {
       const allocated = Number(b.amount || 0);
       const used = Number(b.totalSpend || 0);
 
-      const usedWithin = Math.min(used, allocated); // part of used within allocation
-      const remaining = Math.max(allocated - used, 0); // leftover part of allocation
-      const over = Math.max(used - allocated, 0); // spent beyond allocation
-
       return {
         name: b.name,
-        usedWithin,
-        remaining,
-        over,
-        allocated, // keep originals for tooltip
-        used, // "
+        usedWithin: Math.min(used, allocated),
+        remaining: Math.max(allocated - used, 0),
+        over: Math.max(used - allocated, 0),
+        allocated,
+        used,
       };
     });
   }, [budgetList]);
 
-  // Current month name (e.g., "November")
-  const monthName = React.useMemo(() => {
+  const monthName = useMemo(() => {
     try {
-      return new Date().toLocaleString(undefined, { month: 'long' });
-    } catch (e) {
-      return new Date().toLocaleString('en-US', { month: 'long' });
+      return new Date().toLocaleString(undefined, { month: "long" });
+    } catch {
+      return new Date().toLocaleString("en-US", { month: "long" });
     }
   }, []);
 
-  const hasRows = data.length > 0;
-  const hasNonZero = hasRows && data.some((d) => d.allocated > 0 || d.used > 0);
+  const hasNonZero =
+    data.length > 0 &&
+    data.some((d) => d.allocated > 0 || d.used > 0);
 
-  // Nice Y domain with headroom so labels don't touch the top
   const yMax = useMemo(() => {
     if (!hasNonZero) return 0;
-    const max = Math.max(
-      ...data.map((d) => Math.max(d.allocated, d.used))
-    );
-    return Math.ceil(max * 1.12); // 12% headroom
+    const max = Math.max(...data.map((d) => Math.max(d.allocated, d.used)));
+    return Math.ceil(max * 1.12);
   }, [data, hasNonZero]);
 
+  /* -------------------------------------------------------------------------- */
+  /*  Render                                                                      */
+  /* -------------------------------------------------------------------------- */
   return (
     <div className="rounded-lg">
-  <h2 className="font-bold text-lg mb-4">Spending Breakdown for {monthName}</h2>
+      <h2 className="font-bold text-lg mb-4">
+        Spending Breakdown for {monthName}
+      </h2>
 
       {isLoading ? (
-        <div className="h-[00px] flex items-center justify-center gap-2 rounded-md bg-gradient-to-br from-indigo-50 to-white">
+        <div className="h-[200px] flex items-center justify-center gap-2 rounded-md bg-gradient-to-br from-indigo-50 to-white">
           <Loader2 className="h-5 w-5 animate-spin text-indigo-600" />
           <span className="text-sm text-gray-600">Loading your data…</span>
         </div>
@@ -90,13 +104,18 @@ function BarChartDashboard({ budgetList = [], isLoading = false }) {
           </p>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={320}>
+        <ResponsiveContainer width="100%" height={420}>
           <BarChart
             data={data}
-            margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+            margin={{
+              top: 8,
+              right: 8,
+              left: 0,
+              bottom: isMobile ? 40 : 20, // 👈 room for rotated labels
+            }}
             barCategoryGap="20%"
           >
-            {/* Gradients + stripes */}
+            {/* Gradients + patterns */}
             <defs>
               <linearGradient id="usedGrad" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="#6366F1" />
@@ -106,41 +125,64 @@ function BarChartDashboard({ budgetList = [], isLoading = false }) {
                 <stop offset="0%" stopColor="#93C5FD" />
                 <stop offset="100%" stopColor="#A7F3D0" />
               </linearGradient>
-              <pattern id="overPattern" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <pattern
+                id="overPattern"
+                width="6"
+                height="6"
+                patternUnits="userSpaceOnUse"
+                patternTransform="rotate(45)"
+              >
                 <rect width="6" height="6" fill="#FCA5A5" />
                 <rect width="2" height="6" fill="#EF4444" />
               </pattern>
             </defs>
 
+            {/* X / Y Axes */}
             <XAxis
               dataKey="name"
-              tickMargin={8}
               interval={0}
+              tick={{
+                angle: isMobile ? -35 : 0,
+                textAnchor: isMobile ? "end" : "middle",
+              }}
+              tickMargin={10}
+              height={isMobile ? 60 : 40}
             />
+
             <YAxis
               tickFormatter={fmtAxis}
               domain={[0, yMax]}
               tickMargin={8}
             />
+
+            {/* Tooltip */}
             <Tooltip
               cursor={{ fill: "rgba(0,0,0,0.04)" }}
               content={({ active, payload, label }) => {
-                if (!active || !payload || !payload.length) return null;
+                if (!active || !payload?.length) return null;
                 const row = payload[0].payload;
                 return (
                   <div className="rounded-md bg-white px-3 py-2 shadow-md border text-sm">
                     <div className="font-semibold mb-1">{label}</div>
-                    <div>Amount Used: <b>{fmtMoney(row.used)}</b></div>
-                    <div>Amount Allocated: <b>{fmtMoney(row.allocated)}</b></div>
+                    <div>
+                      Amount Used: <b>{fmtMoney(row.used)}</b>
+                    </div>
+                    <div>
+                      Amount Allocated: <b>{fmtMoney(row.allocated)}</b>
+                    </div>
                     {row.over > 0 && (
-                      <div className="text-red-600">Over by: <b>{fmtMoney(row.over)}</b></div>
+                      <div className="text-red-600">
+                        Over by: <b>{fmtMoney(row.over)}</b>
+                      </div>
                     )}
                   </div>
                 );
               }}
             />
-            <Legend wrapperStyle={{ marginTop: 30 }} />
-            {/* Stacked = allocation (usedWithin + remaining) plus any overspend on top */}
+
+            <Legend verticalAlign="top" align="center" margin={{bottom: 10}} />
+
+            {/* Bars */}
             <Bar
               dataKey="usedWithin"
               name="Amount Used"
