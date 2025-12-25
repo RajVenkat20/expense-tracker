@@ -12,6 +12,23 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+
+// Custom Tooltip to render value in bold
+function CustomTooltip({ active, payload, label }) {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
+        <div style={{ marginBottom: 4, color: '#6b7280', fontWeight: 600 }}>{label}</div>
+        {payload.map((entry, idx) => (
+          <div key={idx} style={{ color: entry.color, marginBottom: 2 }}>
+            {entry.name}: <span style={{ fontWeight: 'bold' }}>{currencyFormatter(entry.value)}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return null;
+}
 import { Button } from "@/components/ui/button";
 
 const RANGE_OPTIONS = [
@@ -147,14 +164,7 @@ export default function IncomeExpensesBarChart({ userId }) {
                 tick={{ fill: "#6b7280", fontSize: 12 }}
                 tickFormatter={currencyFormatter}
               />
-              <Tooltip
-                formatter={(value) => currencyFormatter(value)}
-                contentStyle={{
-                  backgroundColor: "#ffffff",
-                  borderRadius: "8px",
-                  border: "1px solid #e5e7eb",
-                }}
-              />
+              <Tooltip content={<CustomTooltip />} />
               <Legend />
 
               <Bar
