@@ -141,10 +141,10 @@ function BudgetsDonut({ budgetList = [], isLoading = false }) {
         {data.map((d, i) => (
           <div key={i} className="flex items-center gap-2">
             <span
-              className="h-2.5 w-2.5 rounded-full"
+              className="h-3.5 w-3.5 rounded-full"
               style={{ backgroundColor: d.fill }}
             />
-            <span className="text-gray-600 truncate">{d.name}</span>
+            <span className="text-gray-600 text-sm truncate">{d.name}</span>
           </div>
         ))}
       </div>
