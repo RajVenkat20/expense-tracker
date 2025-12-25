@@ -99,7 +99,7 @@ function BudgetsDonut({ budgetList = [], isLoading = false }) {
               <Cell
                 key={idx}
                 fill={entry.fill}
-                className="transition-transform duration-200 hover:scale-[1.04]"
+                className="transform transition-all ease-out duration-300 hover:shadow-lg hover:scale-[1.04]"
               />
             ))}
 

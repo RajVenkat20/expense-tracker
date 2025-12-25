@@ -77,7 +77,7 @@ function BarChartDashboard({ budgetList = [], isLoading = false }) {
   <h2 className="font-bold text-lg mb-4">Spending Breakdown for {monthName}</h2>
 
       {isLoading ? (
-        <div className="h-[300px] flex items-center justify-center gap-2 rounded-md bg-gradient-to-br from-indigo-50 to-white">
+        <div className="h-[00px] flex items-center justify-center gap-2 rounded-md bg-gradient-to-br from-indigo-50 to-white">
           <Loader2 className="h-5 w-5 animate-spin text-indigo-600" />
           <span className="text-sm text-gray-600">Loading your data…</span>
         </div>
