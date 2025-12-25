@@ -140,7 +140,10 @@ function Dashboard() {
   return (
     <div className="p-8">
       <CreateIncomeExpense
-        onIncomeAdded={() => setChartRefreshKey((k) => k + 1)}
+        onIncomeAdded={() => {
+    getBudgetList();               // refresh monthlyEarnings & recents
+    setChartRefreshKey((k) => k + 1);
+  }}
         onExpenseAdded={() => {
           getBudgetList();               // refresh budgets & recents
           setChartRefreshKey((k) => k + 1);
