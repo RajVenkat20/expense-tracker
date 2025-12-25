@@ -72,8 +72,7 @@ function BarChartDashboard({ budgetList = [], isLoading = false }) {
   }, []);
 
   const hasNonZero =
-    data.length > 0 &&
-    data.some((d) => d.allocated > 0 || d.used > 0);
+    data.length > 0 && data.some((d) => d.allocated > 0 || d.used > 0);
 
   const yMax = useMemo(() => {
     if (!hasNonZero) return 0;
@@ -86,9 +85,14 @@ function BarChartDashboard({ budgetList = [], isLoading = false }) {
   /* -------------------------------------------------------------------------- */
   return (
     <div className="rounded-lg">
-      <h2 className="font-bold text-lg mb-4">
-        Spending Breakdown for {monthName}
-      </h2>
+      <div className="w-full rounded-2xl bg-white">
+        <h2 className="font-bold text-lg">
+          Spending Breakdown for {monthName}
+        </h2>
+        <p className="text-sm text-gray-400">
+          How your spending compares to monthly budgets
+        </p>
+      </div>
 
       {isLoading ? (
         <div className="h-[200px] flex items-center justify-center gap-2 rounded-md bg-gradient-to-br from-indigo-50 to-white">
@@ -149,11 +153,7 @@ function BarChartDashboard({ budgetList = [], isLoading = false }) {
               height={isMobile ? 60 : 40}
             />
 
-            <YAxis
-              tickFormatter={fmtAxis}
-              domain={[0, yMax]}
-              tickMargin={8}
-            />
+            <YAxis tickFormatter={fmtAxis} domain={[0, yMax]} tickMargin={8} />
 
             {/* Tooltip */}
             <Tooltip
@@ -180,7 +180,11 @@ function BarChartDashboard({ budgetList = [], isLoading = false }) {
               }}
             />
 
-            <Legend verticalAlign="top" align="center" margin={{bottom: 10}} />
+            <Legend
+              verticalAlign="top"
+              align="center"
+              margin={{ bottom: 10 }}
+            />
 
             {/* Bars */}
             <Bar

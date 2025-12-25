@@ -183,7 +183,14 @@ function Dashboard() {
       {/* Recent Expenses card */}
       <div className="grid mt-5">
         <div className="border-2 shadow-md shadow-indigo-300 rounded-lg p-5 transform transition-all ease-out duration-300 hover:shadow-lg">
-          <h2 className="font-bold text-lg mb-4">Recent Expenses</h2>
+          <div className="mb-4">
+        <h2 className="font-bold text-lg text-gray-800">
+          Recent Expenses
+        </h2>
+        <p className="text-sm text-gray-400">
+          Your latest transactions across all categories ordered by date of transaction.
+        </p>
+      </div>
 
           <ExpenseListTable
             showCategory   // tell the table to render the Category column
