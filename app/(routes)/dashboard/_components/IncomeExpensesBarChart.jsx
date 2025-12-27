@@ -46,7 +46,7 @@ const currencyFormatter = (value) =>
   `$${Number(value).toLocaleString()}`;
 
 export default function IncomeExpensesBarChart({ userId }) {
-  const [range, setRange] = useState(3);
+  const [range, setRange] = useState(6);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -92,7 +92,7 @@ export default function IncomeExpensesBarChart({ userId }) {
         });
 
         const expenses = filteredExpenses.reduce((sum, r) => sum + Number(r.amount), 0);
-        
+
         return {
           name: formatMonthYear(month, year),
           income,
