@@ -72,7 +72,6 @@ export default function CreateIncomeExpense({ onIncomeAdded, onExpenseAdded }) {
       setIncomeOpen(false);
       resetIncome();
     } catch (err) {
-      console.error(err);
       toast.error("Failed to add income. Please try again.");
     }
   };
@@ -109,7 +108,6 @@ export default function CreateIncomeExpense({ onIncomeAdded, onExpenseAdded }) {
         const rows = await db.select().from(Budgets).where(eq(Budgets.createdBy, email));
         setBudgets(rows || []);
       } catch (err) {
-        console.error(err);
         toast.error("Could not load your budgets.");
       } finally {
         setLoadingBudgets(false);
@@ -151,7 +149,6 @@ export default function CreateIncomeExpense({ onIncomeAdded, onExpenseAdded }) {
       setExpenseOpen(false);
       resetExpense();
     } catch (err) {
-      console.error(err);
       toast.error("Failed to add expense. Please try again.");
     }
   };

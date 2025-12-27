@@ -94,7 +94,6 @@ function CreateBudget({ refreshData }) {
         resetForm();
       }
     } catch (err) {
-      console.error(err);
       toast.error("Failed to create category. Please try again.");
     } finally {
       setIsSaving(false);
