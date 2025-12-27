@@ -46,7 +46,7 @@ const currencyFormatter = (value) =>
   `$${Number(value).toLocaleString()}`;
 
 export default function IncomeExpensesBarChart({ userId }) {
-  const [range, setRange] = useState(6);
+  const [range, setRange] = useState(3);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -74,22 +74,25 @@ export default function IncomeExpensesBarChart({ userId }) {
         .where(eq(Expenses.createdBy, userId));
 
       const chartData = months.map(({ month, year }) => {
-        const income = incomeResults
-          .filter(
-            (r) =>
-              new Date(r.createdAt).getMonth() + 1 === month &&
-              new Date(r.createdAt).getFullYear() === year
-          )
-          .reduce((sum, r) => sum + Number(r.amount), 0);
+        const incStartDateStr = `${year}-${String(month).padStart(2, '0')}-01`;
+        const incEndDateObj = new Date(year, month, 0);
+        const incEndDateStr = `${year}-${String(month).padStart(2, '0')}-${String(incEndDateObj.getDate()).padStart(2, '0')}`;
+        const filteredIncome = incomeResults.filter((r) => {
+          const createdStr = r.createdAt.slice(0, 10); // "YYYY-MM-DD"
+          return createdStr >= incStartDateStr && createdStr <= incEndDateStr;
+        });
+        const income = filteredIncome.reduce((sum, r) => sum + Number(r.amount), 0);
 
-        const expenses = expenseResults
-          .filter(
-            (r) =>
-              new Date(r.createdAt).getMonth() + 1 === month &&
-              new Date(r.createdAt).getFullYear() === year
-          )
-          .reduce((sum, r) => sum + Number(r.amount), 0);
+        const startDateStr = `${year}-${String(month).padStart(2, '0')}-01`;
+        const endDateObj = new Date(year, month, 0);
+        const endDateStr = `${year}-${String(month).padStart(2, '0')}-${String(endDateObj.getDate()).padStart(2, '0')}`;
+        const filteredExpenses = expenseResults.filter((r) => {
+          const createdStr = r.createdAt.slice(0, 10); // "YYYY-MM-DD"
+          return createdStr >= startDateStr && createdStr <= endDateStr;
+        });
 
+        const expenses = filteredExpenses.reduce((sum, r) => sum + Number(r.amount), 0);
+        
         return {
           name: formatMonthYear(month, year),
           income,
